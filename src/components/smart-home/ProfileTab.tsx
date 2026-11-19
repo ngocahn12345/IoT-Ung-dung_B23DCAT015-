@@ -307,38 +307,6 @@ export function ProfileTab() {
               <ExternalLink className="h-3 w-3 text-muted-foreground" />
             </a>
           </div>
-
-          <div className="pt-1">
-            {profile.pdfReport ? (
-              <a
-                href={profile.pdfReport}
-                target="_blank"
-                download={profile.pdfReportName || "BaoCao_IoT.pdf"}
-                rel="noreferrer"
-                className="flex items-center justify-between rounded-xl bg-rose-500/10 border border-rose-500/20 px-3 py-2 text-xs transition-colors hover:bg-rose-500/20 text-rose-600"
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <FileText className="h-3.5 w-3.5 text-rose-500 shrink-0" />
-                  <span className="font-medium truncate">
-                    {profile.pdfReportName || "Tài liệu Báo Cáo PDF"}
-                  </span>
-                </div>
-                <Download className="h-3 w-3 text-rose-500 shrink-0" />
-              </a>
-            ) : (
-              <button
-                type="button"
-                onClick={() => pdfInputRef.current?.click()}
-                className="flex items-center justify-between w-full rounded-xl border border-dashed border-border bg-secondary/40 px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <FileText className="h-3.5 w-3.5 text-rose-500" />
-                  <span className="font-medium">Tải lên File PDF Báo Cáo Nghiệm Thu</span>
-                </div>
-                <Upload className="h-3 w-3 text-muted-foreground" />
-              </button>
-            )}
-          </div>
         </div>
       </div>
 
