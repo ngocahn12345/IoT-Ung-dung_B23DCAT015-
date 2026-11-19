@@ -57,6 +57,7 @@ export interface UserProfileData {
   linkedin: string;
   figma: string;
   apiDocs: string;
+  googleDrive: string;
   pdfReport: string;
   pdfReportName?: string;
   twitter: string;
@@ -86,11 +87,12 @@ export const initialProfile: UserProfileData = {
   email: "linhchichibi21112014@gmail.com",
   phone: "0978701633",
   location: "Hà Đông, Hà Nội, Việt Nam",
-  github: "https://github.com/ngocahn12345/IoT-v-Ung-dung_B23DCAT015",
-  portfolio: "https://github.com/ngocahn12345/IoT-v-Ung-dung_B23DCAT015",
-  linkedin: "https://linkedin.com/in/ngocanh-developer",
-  figma: "https://www.figma.com/design/57Qym2APRwgdNh9MIu0KHA/EcoLiving_IoT?node-id=0-1&t=tzG4DpgTwPLiIpeQ-1",
-  apiDocs: "https://web.postman.co/workspace/IoT-System-API",
+  github: "https://github.com/ngocahn12345/IoT-Ung-dung_B23DCAT015-",
+  portfolio: "https://github.com/ngocahn12345/IoT-Ung-dung_B23DCAT015-",
+  linkedin: "https://drive.google.com/drive/folders/1cO8buMF3plyfa8ac4xX1Jwebg79oR1of?usp=sharing",
+  figma: "https://www.figma.com/design/Ba7cC3hhH3Tya1SygJslsM/EcoLiving_Iot_B23DCAT015?node-id=0-1&t=eZsKdaWncHiblLfT-1",
+  apiDocs: "https://documenter.getpostman.com/view/60122617/2sBYHbsw9Z#intro",
+  googleDrive: "https://drive.google.com/drive/folders/1cO8buMF3plyfa8ac4xX1Jwebg79oR1of?usp=sharing",
   pdfReport: "",
   pdfReportName: "BaoCao_BTL_IoT.pdf",
   twitter: "https://twitter.com/ngocanh_iot",

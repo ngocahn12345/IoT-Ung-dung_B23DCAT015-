@@ -10,6 +10,7 @@ import {
   FileText,
   Github,
   GraduationCap,
+  HardDrive,
   Sparkles,
   Upload,
   User,
@@ -293,13 +294,28 @@ export function ProfileTab() {
               <ExternalLink className="h-3 w-3 text-muted-foreground" />
             </a>
 
+            <a
+              href={profile.googleDrive || "https://drive.google.com/drive/folders/1cO8buMF3plyfa8ac4xX1Jwebg79oR1of?usp=sharing"}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between rounded-xl bg-secondary/60 px-3 py-2 transition-colors hover:bg-secondary hover:text-blue-500"
+            >
+              <div className="flex items-center gap-2">
+                <HardDrive className="h-3.5 w-3.5 text-blue-500" />
+                <span className="font-medium">Thư mục Google Drive</span>
+              </div>
+              <ExternalLink className="h-3 w-3 text-muted-foreground" />
+            </a>
+          </div>
+
+          <div className="pt-1">
             {profile.pdfReport ? (
               <a
                 href={profile.pdfReport}
                 target="_blank"
                 download={profile.pdfReportName || "BaoCao_IoT.pdf"}
                 rel="noreferrer"
-                className="flex items-center justify-between rounded-xl bg-rose-500/10 border border-rose-500/20 px-3 py-2 transition-colors hover:bg-rose-500/20 text-rose-600"
+                className="flex items-center justify-between rounded-xl bg-rose-500/10 border border-rose-500/20 px-3 py-2 text-xs transition-colors hover:bg-rose-500/20 text-rose-600"
               >
                 <div className="flex items-center gap-2 truncate">
                   <FileText className="h-3.5 w-3.5 text-rose-500 shrink-0" />
@@ -313,11 +329,11 @@ export function ProfileTab() {
               <button
                 type="button"
                 onClick={() => pdfInputRef.current?.click()}
-                className="flex items-center justify-between rounded-xl border border-dashed border-border bg-secondary/40 px-3 py-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground cursor-pointer"
+                className="flex items-center justify-between w-full rounded-xl border border-dashed border-border bg-secondary/40 px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <FileText className="h-3.5 w-3.5 text-rose-500" />
-                  <span className="font-medium">Tải lên File PDF</span>
+                  <span className="font-medium">Tải lên File PDF Báo Cáo Nghiệm Thu</span>
                 </div>
                 <Upload className="h-3 w-3 text-muted-foreground" />
               </button>
@@ -570,9 +586,21 @@ export function ProfileTab() {
                       </label>
                       <input
                         type="url"
-                        placeholder="https://web.postman.co/... hoặc Swagger URL"
+                        placeholder="https://documenter.getpostman.com/view/..."
                         value={editForm.apiDocs}
                         onChange={(e) => setEditForm({ ...editForm, apiDocs: e.target.value })}
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium focus:border-primary focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block font-semibold text-foreground">
+                        Thư mục Google Drive URL:
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://drive.google.com/drive/folders/..."
+                        value={editForm.googleDrive || ""}
+                        onChange={(e) => setEditForm({ ...editForm, googleDrive: e.target.value })}
                         className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium focus:border-primary focus:outline-none"
                       />
                     </div>

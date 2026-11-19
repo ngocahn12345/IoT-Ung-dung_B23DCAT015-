@@ -346,8 +346,17 @@ async function initDatabase() {
       `INSERT INTO \`User\`
         (user_id, username, password, fullname, created_at, email, student_id, dob, gender, phone, address, school, major, cohort, github_link, figma_link, avatar, updated_at, postman_url)
        VALUES
-        (1, 'admin', ?, 'Nguyễn Thị Ngọc Anh', '2026-11-12', 'linhchichibi21112014@gmail.com', 'B23DCAT015', '2005-08-01', 'Nữ', '0978701633', 'Hà Đông, Hà Nội, Việt Nam', 'Học viện Công nghệ Bưu chính Viễn thông (PTIT)', 'An toàn thông tin', '2023 - 2028', 'https://github.com/ngocahn12345/IoT-v-Ung-dung_B23DCAT015', 'https://www.figma.com/design/57Qym2APRwgdNh9MIu0KHA/EcoLiving_IoT?node-id=0-1&t=tzG4DpgTwPLiIpeQ-1', '/ngoc-anh-avatar.png', NULL, 'https://web.postman.co/workspace/IoT-System-API')`,
+        (1, 'admin', ?, 'Nguyễn Thị Ngọc Anh', '2026-11-12', 'linhchichibi21112014@gmail.com', 'B23DCAT015', '2005-08-01', 'Nữ', '0978701633', 'Hà Đông, Hà Nội, Việt Nam', 'Học viện Công nghệ Bưu chính Viễn thông (PTIT)', 'An toàn thông tin', '2023 - 2028', 'https://github.com/ngocahn12345/IoT-Ung-dung_B23DCAT015-', 'https://www.figma.com/design/Ba7cC3hhH3Tya1SygJslsM/EcoLiving_Iot_B23DCAT015?node-id=0-1&t=eZsKdaWncHiblLfT-1', '/ngoc-anh-avatar.png', NULL, 'https://documenter.getpostman.com/view/60122617/2sBYHbsw9Z#intro')`,
       [hashPassword(adminPass)]
+    );
+  } else {
+    // Cập nhật lại các liên kết mới nhất cho tài khoản admin
+    await pool.query(
+      `UPDATE \`User\` SET 
+        github_link = 'https://github.com/ngocahn12345/IoT-Ung-dung_B23DCAT015-',
+        figma_link = 'https://www.figma.com/design/Ba7cC3hhH3Tya1SygJslsM/EcoLiving_Iot_B23DCAT015?node-id=0-1&t=eZsKdaWncHiblLfT-1',
+        postman_url = 'https://documenter.getpostman.com/view/60122617/2sBYHbsw9Z#intro'
+       WHERE user_id = 1`
     );
   }
 
