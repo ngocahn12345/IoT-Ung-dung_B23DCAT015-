@@ -216,7 +216,7 @@ node simulate-esp32.js
 - 🎨 **Figma Prototype UI/UX (Đầy đủ tương tác nút & chuyển trang):** [Trải nghiệm Prototype EcoLiving IoT](https://www.figma.com/proto/hIsVeNHyv5rSlFri1fDhzC/EcoLiving_Iot?node-id=5-638&starting-point-node-id=5%3A638&scaling=contain)
 - 🎨 **Figma Design File:** [Thiết kế Giao diện EcoLiving IoT trên Figma](https://www.figma.com/design/hIsVeNHyv5rSlFri1fDhzC/EcoLiving_Iot?node-id=5-638)
 - 💻 **Kho mã nguồn GitHub:** [Repository IoT-Ung-dung_B23DCAT015-](https://github.com/ngocahn12345/IoT-Ung-dung_B23DCAT015-)
-- 📮 **Tài liệu API Postman:** [PTIT IoT Postman Collection](./postman/PTIT_IoT.postman_collection.json)
+- 📮 **Tài liệu Đặc tả API Postman:** [Hướng dẫn & Đặc tả API chi tiết](./postman/API_DOCUMENTATION.md) (kèm [Postman Collection](./postman/PTIT_IoT.postman_collection.json))
 - 📄 **Báo cáo BTL hoàn chỉnh:** [Bao_Cao_BTL_IoT_B23DCAT015_NguyenThiNgocAnh.docx](./Bao_Cao_BTL_IoT_B23DCAT015_NguyenThiNgocAnh.docx)
 
 ---
