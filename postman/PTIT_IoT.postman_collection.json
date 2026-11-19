@@ -1,0 +1,752 @@
+{
+  "info": {
+    "_postman_id": "7f3c8b2a-9c41-4a56-b2c8-202611120001",
+    "name": "PTIT IoT",
+    "description": "Bộ API điều khiển và giám sát hệ thống EcoLiving - B23DCAT015.\n\nHướng dẫn chạy:\n1. Chọn Environment 'EcoLiving Local'.\n2. Chạy 'Đăng nhập (lấy API key)' để tự động lưu api_key.\n3. Thử các API Điều khiển và Xem dữ liệu.\n4. Chạy 'Đăng xuất' rồi chạy 'Thử gọi không có API key (401)' để kiểm tra bảo mật.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Đăng nhập",
+      "item": [
+        {
+          "name": "Đăng nhập (lấy API key)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Đăng nhập thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Có trả về api_key\", function () {",
+                  "    pm.expect(json.api_key).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "if (json && json.api_key) {",
+                  "    pm.environment.set(\"api_key\", json.api_key);",
+                  "    pm.collectionVariables.set(\"api_key\", json.api_key);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "admin",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "123456",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Đăng xuất",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Đăng xuất thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Điều khiển",
+      "item": [
+        {
+          "name": "Bật đèn (LED 3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Gửi lệnh ON cho Bật đèn (LED 3) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "device",
+                  "value": "{{den}}",
+                  "type": "text"
+                },
+                {
+                  "key": "action",
+                  "value": "ON",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Bật đèn chiếu sáng (LED 3 trên chân GPIO 7)"
+          }
+        },
+        {
+          "name": "Tắt đèn (LED 3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Gửi lệnh OFF cho Tắt đèn (LED 3) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "device",
+                  "value": "{{den}}",
+                  "type": "text"
+                },
+                {
+                  "key": "action",
+                  "value": "OFF",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Tắt đèn chiếu sáng (LED 3 trên chân GPIO 7)"
+          }
+        },
+        {
+          "name": "Bật quạt (LED 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Gửi lệnh ON cho Bật quạt (LED 2) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "device",
+                  "value": "{{quat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "action",
+                  "value": "ON",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Bật quạt thông gió (LED 2 trên chân GPIO 6)"
+          }
+        },
+        {
+          "name": "Tắt quạt (LED 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Gửi lệnh OFF cho Tắt quạt (LED 2) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "device",
+                  "value": "{{quat}}",
+                  "type": "text"
+                },
+                {
+                  "key": "action",
+                  "value": "OFF",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Tắt quạt thông gió (LED 2 trên chân GPIO 6)"
+          }
+        },
+        {
+          "name": "Bật điều hòa (LED 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Gửi lệnh ON cho Bật điều hòa (LED 1) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "device",
+                  "value": "{{dieuhoa}}",
+                  "type": "text"
+                },
+                {
+                  "key": "action",
+                  "value": "ON",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Bật điều hòa không khí (LED 1 trên chân GPIO 5)"
+          }
+        },
+        {
+          "name": "Tắt điều hòa (LED 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Gửi lệnh OFF cho Tắt điều hòa (LED 1) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "device",
+                  "value": "{{dieuhoa}}",
+                  "type": "text"
+                },
+                {
+                  "key": "action",
+                  "value": "OFF",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Tắt điều hòa không khí (LED 1 trên chân GPIO 5)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Xem dữ liệu",
+      "item": [
+        {
+          "name": "Số liệu Dashboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Lấy số liệu Dashboard thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Danh sách 3 thiết bị",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Lấy danh sách thiết bị thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Trả về đủ 3 thiết bị\", function () {",
+                  "    pm.expect(json.devices).to.be.an(\"array\").with.lengthOf(3);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/devices",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "devices"
+              ]
+            },
+            "description": "Lấy danh mục và trạng thái hiện tại của 3 thiết bị (LED 1, LED 2, LED 3) từ bảng Devices"
+          }
+        },
+        {
+          "name": "Dữ liệu cảm biến (lọc + phân trang)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Lấy dữ liệu cảm biến thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sensors/history?page=1&limit=10&type=ALL&status=ALL",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "sensors",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "type",
+                  "value": "ALL",
+                  "description": "ALL | TEMPERATURE | HUMIDITY | LIGHT | TIME"
+                },
+                {
+                  "key": "status",
+                  "value": "ALL",
+                  "description": "ALL | NORMAL | WARNING | CRITICAL"
+                },
+                {
+                  "key": "search",
+                  "value": ">25",
+                  "disabled": true,
+                  "description": "Từ khóa, ngày (YYYY-MM-DD) hoặc so sánh (>28, <=70)"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id",
+                  "disabled": true
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Lịch sử thao tác (lọc + phân trang)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Lấy lịch sử thao tác thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/actions/history?page=1&limit=10&device=ALL&action=ALL&status=ALL",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "actions",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "device",
+                  "value": "ALL",
+                  "description": "ALL | led1 | led2 | led3 | FAN | LIGHT | AC"
+                },
+                {
+                  "key": "action",
+                  "value": "ALL",
+                  "description": "ALL | ON | OFF"
+                },
+                {
+                  "key": "status",
+                  "value": "ALL",
+                  "description": "ALL | ON | OFF | LOADING"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hồ sơ cá nhân sinh viên",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Lấy thông tin sinh viên thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Mã sinh viên đúng chuẩn B23DCAT015\", function () {",
+                  "    pm.expect(json.user.student_id).to.eql(\"B23DCAT015\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "user"
+              ]
+            },
+            "description": "Lấy thông tin cá nhân sinh viên Nguyễn Thị Ngọc Anh - B23DCAT015 từ bảng User"
+          }
+        },
+        {
+          "name": "Thử gọi không có API key (401) - chạy sau Đăng xuất",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Trả về 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text",
+                "disabled": true,
+                "description": "Để trống (tắt) để thử không có API key, hoặc bật lên sau khi chạy Đăng xuất để thử key đã bị thu hồi"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "api_key",
+      "value": ""
+    }
+  ]
+}

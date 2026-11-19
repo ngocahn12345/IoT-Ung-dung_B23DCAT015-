@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base_url}}/api/dashboard"
+method: GET
+headers:
+  - key: x-api-key
+    value: "{{api_key}}"
+    disabled: true
+    description: Để trống (tắt) để thử không có API key, hoặc bật lên sau khi chạy Đăng xuất để thử key đã bị thu hồi
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Trả về 401 Unauthorized", function () {
+          pm.response.to.have.status(401);
+      });
+    language: text/javascript
+order: 6000

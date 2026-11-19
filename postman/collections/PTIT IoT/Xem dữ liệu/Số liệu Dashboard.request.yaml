@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/api/dashboard"
+method: GET
+headers:
+  x-api-key: "{{api_key}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Lấy số liệu Dashboard thành công (200)", function () {
+          pm.response.to.have.status(200);
+      });
+    language: text/javascript
+order: 1000

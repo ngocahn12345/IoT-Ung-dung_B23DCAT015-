@@ -1,0 +1,18 @@
+$kind: http-request
+description: Lấy thông tin cá nhân sinh viên Nguyễn Thị Ngọc Anh - B23DCAT015 từ bảng User
+url: "{{base_url}}/api/user"
+method: GET
+headers:
+  x-api-key: "{{api_key}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Lấy thông tin sinh viên thành công (200)", function () {
+          pm.response.to.have.status(200);
+      });
+      const json = pm.response.json();
+      pm.test("Mã sinh viên đúng chuẩn B23DCAT015", function () {
+          pm.expect(json.user.student_id).to.eql("B23DCAT015");
+      });
+    language: text/javascript
+order: 5000

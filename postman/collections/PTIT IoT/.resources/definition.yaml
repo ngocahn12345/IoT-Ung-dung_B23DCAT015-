@@ -1,0 +1,11 @@
+$kind: collection
+description: |-
+  Bộ API điều khiển và giám sát hệ thống EcoLiving - B23DCAT015.
+
+  Hướng dẫn chạy:
+  1. Chọn Environment 'EcoLiving Local'.
+  2. Chạy 'Đăng nhập (lấy API key)' để tự động lưu api_key.
+  3. Thử các API Điều khiển và Xem dữ liệu.
+  4. Chạy 'Đăng xuất' rồi chạy 'Thử gọi không có API key (401)' để kiểm tra bảo mật.
+variables:
+  api_key: ""

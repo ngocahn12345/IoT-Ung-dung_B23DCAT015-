@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{base_url}}/api/actions/history?page=1&limit=10&device=ALL&action=ALL&status=ALL"
+method: GET
+headers:
+  x-api-key: "{{api_key}}"
+queryParams:
+  - key: page
+    value: "1"
+  - key: limit
+    value: "10"
+  - key: device
+    value: ALL
+    description: ALL | led1 | led2 | led3 | FAN | LIGHT | AC
+  - key: action
+    value: ALL
+    description: ALL | ON | OFF
+  - key: status
+    value: ALL
+    description: ALL | ON | OFF | LOADING
+  - key: search
+    value: ""
+    disabled: true
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Lấy lịch sử thao tác thành công (200)", function () {
+          pm.response.to.have.status(200);
+      });
+    language: text/javascript
+order: 4000

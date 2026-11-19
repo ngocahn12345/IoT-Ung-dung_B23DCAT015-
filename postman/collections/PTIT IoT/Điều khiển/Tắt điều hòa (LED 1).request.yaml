@@ -1,0 +1,23 @@
+$kind: http-request
+description: Tắt điều hòa không khí (LED 1 trên chân GPIO 5)
+url: "{{base_url}}/api/control"
+method: POST
+headers:
+  x-api-key: "{{api_key}}"
+body:
+  type: urlencoded
+  content:
+    device: "{{dieuhoa}}"
+    action: OFF
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Gửi lệnh OFF cho Tắt điều hòa (LED 1) thành công (200)", function () {
+          pm.response.to.have.status(200);
+      });
+      const json = pm.response.json();
+      pm.test("Phản hồi success: true", function () {
+          pm.expect(json.success).to.be.true;
+      });
+    language: text/javascript
+order: 6000

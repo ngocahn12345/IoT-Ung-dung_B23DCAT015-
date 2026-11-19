@@ -1,0 +1,30 @@
+{
+  "name": "home-iot-backend",
+  "version": "1.0.0",
+  "description": "Backend NodeJS MQTT & WebSocket kết nối ESP32 cho hệ thống EcoLiving Smart Home IoT",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "user:list": "node manage_user.js list",
+    "user:passwd": "node manage_user.js passwd",
+    "user:add": "node manage_user.js add"
+  },
+  "keywords": [
+    "iot",
+    "esp32",
+    "mqtt",
+    "websocket",
+    "smart-home"
+  ],
+  "author": "Nguyen Thi Ngoc Anh - B23DCAT015",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mqtt": "^5.10.3",
+    "mysql2": "^3.24.6",
+    "socket.io": "^4.8.1"
+  }
+}

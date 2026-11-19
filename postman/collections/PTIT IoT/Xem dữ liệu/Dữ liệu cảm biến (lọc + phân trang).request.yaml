@@ -1,0 +1,34 @@
+$kind: http-request
+url: "{{base_url}}/api/sensors/history?page=1&limit=10&type=ALL&status=ALL"
+method: GET
+headers:
+  x-api-key: "{{api_key}}"
+queryParams:
+  - key: page
+    value: "1"
+  - key: limit
+    value: "10"
+  - key: type
+    value: ALL
+    description: ALL | TEMPERATURE | HUMIDITY | LIGHT | TIME
+  - key: status
+    value: ALL
+    description: ALL | NORMAL | WARNING | CRITICAL
+  - key: search
+    value: ">25"
+    disabled: true
+    description: Từ khóa, ngày (YYYY-MM-DD) hoặc so sánh (>28, <=70)
+  - key: sortBy
+    value: id
+    disabled: true
+  - key: sortOrder
+    value: desc
+    disabled: true
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Lấy dữ liệu cảm biến thành công (200)", function () {
+          pm.response.to.have.status(200);
+      });
+    language: text/javascript
+order: 3000

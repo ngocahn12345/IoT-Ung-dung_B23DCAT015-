@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoLiving — Hệ Thống Giám Sát & Điều Khiển Smart Home IoT</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR BÊN TRÁI -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h2>EcoLiving</h2>
+          <p>IoT PTIT · B23DCAT015</p>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="tabDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          Bảng điều khiển
+        </button>
+
+        <button class="nav-item" data-tab="tabSensors">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+          Dữ liệu cảm biến
+        </button>
+
+        <button class="nav-item" data-tab="tabLogs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+          Nhật ký hành động
+        </button>
+
+        <button class="nav-item" data-tab="tabProfile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Hồ sơ cá nhân
+        </button>
+      </nav>
+
+      <div class="sidebar-status">
+        <div class="sidebar-status-title">Trạng Thái Kết Nối</div>
+        <div class="status-row">
+          <span>Máy chủ MQTT</span>
+          <span class="badge-dot" style="color: var(--success);"><span class="dot"></span>Trực tuyến</span>
+        </div>
+        <div class="status-row">
+          <span>Cơ sở dữ liệu</span>
+          <span class="badge-dot" style="color: var(--success);"><span class="dot"></span>Trực tuyến</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- KHU VỰC NỘI DUNG CHÍNH -->
+    <div class="main-wrapper">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+          <h1 class="header-title" id="headerTitle">Bảng điều khiển</h1>
+        </div>
+
+        <div class="header-right">
+          <div class="admin-profile">
+            <img src="avatar.png" alt="Avatar" class="avatar-img" onerror="this.src='https://ui-avatars.com/api/?name=Ngoc+Anh&background=0284c7&color=fff'">
+            <div class="admin-info">
+              <div class="admin-name">Ngọc Anh</div>
+              <div class="admin-role">B23DCAT015</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- NỘI DUNG TỪNG TAB -->
+      <main class="content-area">
+
+        <!-- ================= TAB 1: BẢNG ĐIỀU KHIỂN ================= -->
+        <section class="tab-pane active" id="tabDashboard">
+          
+          <!-- Banner Cảnh báo -->
+          <div class="alert-banner">
+            <span style="font-size: 16px;">⚠️</span>
+            <div><strong>Cảnh báo:</strong> Độ ẩm đạt <strong>80.0%</strong> (vượt ngưỡng 75%). Đã tự động kích hoạt quạt thông gió.</div>
+          </div>
+
+          <!-- 3 Thẻ cảm biến -->
+          <div class="section-grid">
+            
+            <div class="sensor-card">
+              <div class="card-top">
+                <span class="card-label">Nhiệt độ phòng</span>
+                <div class="card-icon icon-temp">🌡️</div>
+              </div>
+              <div class="card-value">20.5 <span class="card-unit">°C</span></div>
+              <div><span class="badge badge-normal">● Bình thường</span></div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="card-top">
+                <span class="card-label">Độ ẩm không khí</span>
+                <div class="card-icon icon-hum">💧</div>
+              </div>
+              <div class="card-value">80.0 <span class="card-unit">%</span></div>
+              <div><span class="badge badge-warning">● Cảnh báo cao</span></div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="card-top">
+                <span class="card-label">Cường độ ánh sáng</span>
+                <div class="card-icon icon-lux">☀️</div>
+              </div>
+              <div class="card-value">1000 <span class="card-unit">Lux</span></div>
+              <div><span class="badge badge-normal">● Đủ sáng</span></div>
+            </div>
+
+          </div>
+
+          <!-- 3 Thẻ điều khiển thiết bị -->
+          <div class="section-grid">
+            
+            <!-- Quạt -->
+            <div class="device-card on" id="cardFan">
+              <div class="device-info">
+                <div class="device-icon">🌪️</div>
+                <div>
+                  <div class="device-name">Quạt thông gió</div>
+                  <div class="device-status" id="statusFan">BẬT</div>
+                </div>
+              </div>
+              <div class="device-controls">
+                <div class="mode-pills">
+                  <button class="pill-btn active">Auto</button>
+                  <button class="pill-btn">Manual</button>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggleFan" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Đèn -->
+            <div class="device-card" id="cardLight">
+              <div class="device-info">
+                <div class="device-icon">💡</div>
+                <div>
+                  <div class="device-name">Đèn chiếu sáng</div>
+                  <div class="device-status" id="statusLight">TẮT</div>
+                </div>
+              </div>
+              <div class="device-controls">
+                <div class="mode-pills">
+                  <button class="pill-btn">Auto</button>
+                  <button class="pill-btn active">Manual</button>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggleLight">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Điều hòa -->
+            <div class="device-card on" id="cardAc">
+              <div class="device-info">
+                <div class="device-icon">❄️</div>
+                <div>
+                  <div class="device-name">Điều hòa</div>
+                  <div class="device-status" id="statusAc">BẬT</div>
+                </div>
+              </div>
+              <div class="device-controls">
+                <div class="mode-pills">
+                  <button class="pill-btn active">Auto</button>
+                  <button class="pill-btn">Manual</button>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggleAc" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Biểu đồ biến thiên -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Biểu đồ biến thiên thông số cảm biến thời gian thực</div>
+              <div class="chart-legend">
+                <div class="legend-item"><span class="legend-color" style="background: #f43f5e;"></span> Nhiệt độ (°C)</div>
+                <div class="legend-item"><span class="legend-color" style="background: #0284c7;"></span> Độ ẩm (%)</div>
+                <div class="legend-item"><span class="legend-color" style="background: #f59e0b;"></span> Ánh sáng (Lux)</div>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="sensorChart"></canvas>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ================= TAB 2: DỮ LIỆU CẢM BIẾN ================= -->
+        <section class="tab-pane" id="tabSensors">
+          
+          <div class="toolbar-card">
+            <div class="toolbar-top">
+              <h2 class="toolbar-title">Lịch sử đo đạc cảm biến</h2>
+              <div>
+                <select id="sensorPageSize" class="filter-select">
+                  <option value="5">Hiển thị 5 dòng</option>
+                  <option value="10" selected>Hiển thị 10 dòng</option>
+                  <option value="20">Hiển thị 20 dòng</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="sensorSearchInput" placeholder="Tìm kiếm...">
+              </div>
+
+              <select id="sensorTypeFilter" class="filter-select">
+                <option value="ALL">Tất cả cảm biến</option>
+                <option value="TEMPERATURE">Cảm biến Nhiệt độ</option>
+                <option value="HUMIDITY">Cảm biến Độ ẩm</option>
+                <option value="LIGHT">Cảm biến Ánh sáng</option>
+                <option value="TIME">Thời gian</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mã ID</th>
+                    <th>Tên cảm biến</th>
+                    <th>Vị trí phòng</th>
+                    <th>Giá trị đo</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th>Topic MQTT</th>
+                  </tr>
+                </thead>
+                <tbody id="sensorTableBody">
+                  <!-- Render từ JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination-card">
+              <div id="sensorPaginationInfo">Hiển thị 1 - 10 / 12 bản ghi</div>
+              <div class="pagination-controls" id="sensorPaginationControls"></div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ================= TAB 3: NHẬT KÝ HÀNH ĐỘNG (LỌC TỨC THÌ) ================= -->
+        <section class="tab-pane" id="tabLogs">
+          
+          <div class="toolbar-card">
+            <div class="toolbar-top">
+              <h2 class="toolbar-title">Nhật ký hành động</h2>
+              <div>
+                <select id="actionPageSize" class="filter-select">
+                  <option value="5">Hiển thị 5 dòng</option>
+                  <option value="10" selected>Hiển thị 10 dòng</option>
+                  <option value="20">Hiển thị 20 dòng</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- BỘ LỌC TỨC THÌ -->
+            <div class="filter-row">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="actionSearchInput" placeholder="Tìm kiếm thiết bị, thời gian...">
+              </div>
+
+              <!-- Lọc thiết bị -->
+              <select id="actionDeviceFilter" class="filter-select">
+                <option value="ALL">Thiết bị: Tất cả</option>
+                <option value="FAN">Thiết bị: Quạt</option>
+                <option value="LIGHT">Thiết bị: Đèn</option>
+                <option value="AC">Thiết bị: Điều hòa</option>
+              </select>
+
+              <!-- Lọc hành động -->
+              <select id="actionTypeFilter" class="filter-select">
+                <option value="ALL">Hành động: Tất cả hành động</option>
+                <option value="ON">Hành động: BẬT</option>
+                <option value="OFF">Hành động: TẮT</option>
+              </select>
+
+              <!-- Lọc trạng thái -->
+              <select id="actionStatusFilter" class="filter-select">
+                <option value="ALL">Trạng thái: Tất cả trạng thái</option>
+                <option value="ON">Trạng thái: BẬT</option>
+                <option value="OFF">Trạng thái: TẮT</option>
+                <option value="LOADING">Trạng thái: Đang xử lý</option>
+              </select>
+
+              <button class="btn btn-primary" id="actionSearchBtn" style="pointer-events: none;">
+                🔍 Tìm kiếm
+              </button>
+
+              <button class="btn btn-secondary" id="actionResetBtn">
+                ↻ Đặt lại
+              </button>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mã ID</th>
+                    <th>Thiết bị</th>
+                    <th>Hành động</th>
+                    <th>Trạng thái</th>
+                    <th>Thời gian gửi</th>
+                    <th>Thời gian phản hồi (ACK)</th>
+                  </tr>
+                </thead>
+                <tbody id="actionTableBody">
+                  <!-- Render từ JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination-card">
+              <div id="actionPaginationInfo">Hiển thị 1 - 10 / 10 bản ghi</div>
+              <div class="pagination-controls" id="actionPaginationControls"></div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ================= TAB 4: HỒ SƠ CÁ NHÂN ================= -->
+        <section class="tab-pane" id="tabProfile">
+          
+          <div class="profile-card">
+            <div class="profile-header">
+              <img src="avatar.png" alt="Nguyễn Thị Ngọc Anh" class="profile-avatar-lg" onerror="this.src='https://ui-avatars.com/api/?name=Ngoc+Anh&size=128&background=0284c7&color=fff'">
+              <div class="profile-meta">
+                <h2>Nguyễn Thị Ngọc Anh</h2>
+                <p>Mã sinh viên: B23DCAT015 · Khóa 2023 - 2028</p>
+                <p style="margin-top: 4px; color: var(--primary);">Học viện Công nghệ Bưu chính Viễn thông (PTIT)</p>
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-row">
+                <span class="info-label">Chuyên ngành:</span>
+                <span class="info-val">An toàn thông tin</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Môn học:</span>
+                <span class="info-val">IoT và Ứng dụng</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-val">linhchichibi21112014@gmail.com</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Số điện thoại:</span>
+                <span class="info-val">0978701633</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Địa chỉ:</span>
+                <span class="info-val">Hà Đông, Hà Nội, Việt Nam</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Đề tài:</span>
+                <span class="info-val">Bài Thực Hành 3 — Smart Home Hub</span>
+              </div>
+            </div>
+
+            <div class="skills-section">
+              <h3>Kỹ năng & Công nghệ</h3>
+              <div class="skills-tags">
+                <span class="skill-tag">ESP32</span>
+                <span class="skill-tag">MQTT</span>
+                <span class="skill-tag">DHT11</span>
+                <span class="skill-tag">BH1750</span>
+                <span class="skill-tag">C++</span>
+                <span class="skill-tag">HTML5 / CSS3</span>
+                <span class="skill-tag">JavaScript</span>
+                <span class="skill-tag">Node.js</span>
+                <span class="skill-tag">An toàn thông tin</span>
+              </div>
+
+              <h3>Liên kết dự án & Tài liệu</h3>
+              <div class="links-grid">
+                <a href="https://www.figma.com/design/57Qym2APRwgdNh9MIu0KHA/EcoLiving_IoT?node-id=0-1&t=tzG4DpgTwPLiIpeQ-1" target="_blank" class="link-btn">
+                  🎨 Thiết kế Figma
+                </a>
+                <a href="https://github.com/ngocahn12345/IoT-v-Ung-dung_B23DCAT015" target="_blank" class="link-btn">
+                  💻 Kho GitHub
+                </a>
+                <a href="https://web.postman.co/workspace/IoT-System-API" target="_blank" class="link-btn">
+                  📑 Postman API Docs
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+$kind: http-request
+description: Bật đèn chiếu sáng (LED 3 trên chân GPIO 7)
+url: "{{base_url}}/api/control"
+method: POST
+headers:
+  x-api-key: "{{api_key}}"
+body:
+  type: urlencoded
+  content:
+    device: "{{den}}"
+    action: ON
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Gửi lệnh ON cho Bật đèn (LED 3) thành công (200)", function () {
+          pm.response.to.have.status(200);
+      });
+      const json = pm.response.json();
+      pm.test("Phản hồi success: true", function () {
+          pm.expect(json.success).to.be.true;
+      });
+    language: text/javascript
+order: 1000

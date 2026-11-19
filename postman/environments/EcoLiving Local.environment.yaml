@@ -1,0 +1,12 @@
+name: EcoLiving Local
+values:
+  - key: base_url
+    value: 'http://localhost:5050'
+  - key: api_key
+    value: ''
+  - key: den
+    value: led3
+  - key: quat
+    value: led2
+  - key: dieuhoa
+    value: led1

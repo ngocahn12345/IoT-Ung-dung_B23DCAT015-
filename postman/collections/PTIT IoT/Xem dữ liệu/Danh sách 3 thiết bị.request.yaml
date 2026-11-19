@@ -1,0 +1,18 @@
+$kind: http-request
+description: Lấy danh mục và trạng thái hiện tại của 3 thiết bị (LED 1, LED 2, LED 3) từ bảng Devices
+url: "{{base_url}}/api/devices"
+method: GET
+headers:
+  x-api-key: "{{api_key}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Lấy danh sách thiết bị thành công (200)", function () {
+          pm.response.to.have.status(200);
+      });
+      const json = pm.response.json();
+      pm.test("Trả về đủ 3 thiết bị", function () {
+          pm.expect(json.devices).to.be.an("array").with.lengthOf(3);
+      });
+    language: text/javascript
+order: 2000
