@@ -25,7 +25,7 @@ import {
   YAxis,
 } from "recharts";
 import { cn } from "@/lib/utils";
-import { sendDeviceControl } from "@/lib/api";
+import { sendDeviceControl, sendControlAll } from "@/lib/api";
 import { useIoT } from "./IoTContext";
 
 export interface DeviceState {
@@ -148,6 +148,25 @@ export function DashboardTab() {
     } catch (err) {
       setLoadingDevice(null);
       setControlFeedback(err instanceof Error ? err.message : "Không gửi được lệnh tới Backend");
+    }
+  };
+
+  const handleToggleAll = async (turnOn: boolean) => {
+    setLoadingDevice("all");
+    setControlFeedback(null);
+    try {
+      const res = await sendControlAll(turnOn);
+      setControlFeedback(res.message);
+      setTimeout(() => {
+        setControlFeedback(null);
+        refreshDashboard();
+      }, 3000);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Không thể điều khiển tất cả";
+      setControlFeedback("Lỗi: " + message);
+      setTimeout(() => setControlFeedback(null), 3500);
+    } finally {
+      setTimeout(() => setLoadingDevice(null), 500);
     }
   };
 
@@ -696,7 +715,29 @@ export function DashboardTab() {
               {controlFeedback}
             </span>
           )}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Nút Bật/Tắt Tất Cả LED */}
+            <div className="flex items-center gap-1.5 bg-secondary/40 p-0.5 rounded-lg border border-border/60">
+              <button
+                type="button"
+                onClick={() => handleToggleAll(true)}
+                disabled={loadingDevice === "all"}
+                className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/30 transition-all cursor-pointer disabled:opacity-50"
+                title="Bật đồng loạt cả 4 đèn LED"
+              >
+                {loadingDevice === "all" ? "Đang gửi..." : "Bật tất cả"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToggleAll(false)}
+                disabled={loadingDevice === "all"}
+                className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground border border-border transition-all cursor-pointer disabled:opacity-50"
+                title="Tắt đồng loạt cả 4 đèn LED"
+              >
+                {loadingDevice === "all" ? "..." : "Tắt tất cả"}
+              </button>
+            </div>
+
             <span className="text-xs text-muted-foreground font-medium">
               <span className="font-bold text-foreground">
                 {deviceList.filter((d) => d.on).length}/{deviceList.length}

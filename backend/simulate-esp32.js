@@ -54,10 +54,17 @@ client.on('message', (topic, message) => {
     try {
       const cmd = JSON.parse(cmdStr);
       // Giả lập đóng ngắt chân GPIO
-      if (cmd.led1 !== undefined) ledState.LED1 = cmd.led1 ? 'ON' : 'OFF';
-      if (cmd.led2 !== undefined) ledState.LED2 = cmd.led2 ? 'ON' : 'OFF';
-      if (cmd.led3 !== undefined) ledState.LED3 = cmd.led3 ? 'ON' : 'OFF';
-      if (cmd.led4 !== undefined) ledState.LED4 = cmd.led4 ? 'ON' : 'OFF';
+      if (cmd.all !== undefined || cmd.all_leds !== undefined) {
+        const val = (cmd.all ?? cmd.all_leds) ? 'ON' : 'OFF';
+        ledState.LED1 = val;
+        ledState.LED2 = val;
+        ledState.LED3 = val;
+        ledState.LED4 = val;
+      }
+      if (cmd.led1 !== undefined || cmd['1'] !== undefined) ledState.LED1 = (cmd.led1 ?? cmd['1']) ? 'ON' : 'OFF';
+      if (cmd.led2 !== undefined || cmd['2'] !== undefined) ledState.LED2 = (cmd.led2 ?? cmd['2']) ? 'ON' : 'OFF';
+      if (cmd.led3 !== undefined || cmd['3'] !== undefined) ledState.LED3 = (cmd.led3 ?? cmd['3']) ? 'ON' : 'OFF';
+      if (cmd.led4 !== undefined || cmd['4'] !== undefined) ledState.LED4 = (cmd.led4 ?? cmd['4']) ? 'ON' : 'OFF';
 
       // Giả lập độ trễ phần cứng 50ms rồi gửi Hardware ACK
       setTimeout(() => {

@@ -124,6 +124,12 @@ const DEVICE_ALIASES = {
   canhbao: 'led4',
   canh_bao: 'led4',
   alarm: 'led4',
+  all: 'all',
+  'all-leds': 'all',
+  all_leds: 'all',
+  all_devices: 'all',
+  tatca: 'all',
+  tat_ca: 'all',
 };
 
 function resolveDevice(rawDevice) {
@@ -1330,82 +1336,221 @@ app.get(['/api/actions/history', '/api/actions.php', '/api/actions/logs'], requi
 });
 
 // ==========================================
-// 8. API ĐIỀU KHIỂN THIẾT BỊ (YÊU CẦU API KEY)
+// 8. API ĐIỀU KHIỂN THIẾT BỊ (HỖ TRỢ ĐƠN LẺ, THEO ID, THEO DANH SÁCH ID & TẤT CẢ)
 // ==========================================
 async function handleControlRequest(req, res) {
   try {
-    const rawDevice = req.params?.id || req.body?.device || req.body?.device_id || req.body?.deviceId;
-    const { action, mode = 'manual' } = req.body || {};
+    const isAllPath =
+      req.path.endsWith('/all') ||
+      req.path.endsWith('/all/on') ||
+      req.path.endsWith('/all/off') ||
+      req.params?.id === 'all';
 
-    const devInfo = resolveDevice(rawDevice);
-    if (!devInfo) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tham số device không hợp lệ (hỗ trợ: led1, led2, led3, led4, ac_1, fan_1, led_1, led_4)',
+    // Xác định lệnh nhanh qua URL path (ví dụ: /all/on hoặc /:id/on)
+    let pathAction = null;
+    if (req.path.endsWith('/on')) pathAction = 'ON';
+    else if (req.path.endsWith('/off')) pathAction = 'OFF';
+
+    const globalAction =
+      pathAction ||
+      req.body?.action ||
+      (req.body?.all !== undefined ? (req.body.all ? 'ON' : 'OFF') : undefined);
+    const globalMode = req.body?.mode || 'manual';
+
+    const rawDevice =
+      req.params?.id ??
+      req.body?.id ??
+      req.body?.device_id ??
+      req.body?.deviceId ??
+      req.body?.device;
+
+    const isAllDevice =
+      isAllPath ||
+      rawDevice === 'all' ||
+      rawDevice === 'ALL' ||
+      req.body?.all !== undefined ||
+      globalAction === 'ALL_ON' ||
+      globalAction === 'ALL_OFF';
+
+    let targetItems = []; // Danh sách: { devInfo, action, mode }
+
+    if (isAllDevice) {
+      // 8.1. BẬT / TẮT TẤT CẢ CÁC ĐÈN LED (LED 1 -> LED 4)
+      const effAction =
+        globalAction === 'ALL_OFF'
+          ? 'OFF'
+          : globalAction === 'ALL_ON'
+          ? 'ON'
+          : globalAction || 'ON';
+      const allKeys = ['led1', 'led2', 'led3', 'led4'];
+      for (const k of allKeys) {
+        targetItems.push({
+          devInfo: DEVICE_SPECS[k],
+          action: effAction,
+          mode: globalMode,
+        });
+      }
+    } else if (Array.isArray(req.body?.ids) || Array.isArray(req.body?.device_ids)) {
+      // 8.2. ĐIỀU KHIỂN THEO MẢNG CÁC ID (Ví dụ: ids: [1, 2, 4])
+      const idList = req.body?.ids || req.body?.device_ids;
+      for (const rawId of idList) {
+        const devInfo = resolveDevice(rawId);
+        if (devInfo) {
+          targetItems.push({
+            devInfo,
+            action: globalAction,
+            mode: globalMode,
+          });
+        }
+      }
+    } else if (Array.isArray(req.body?.devices)) {
+      // 8.3. ĐIỀU KHIỂN THEO MẢNG OBJECT HOẶC DANH SÁCH THIẾT BỊ
+      for (const item of req.body.devices) {
+        if (typeof item === 'object' && item !== null) {
+          const dId = item.id ?? item.device_id ?? item.deviceId ?? item.device;
+          const devInfo = resolveDevice(dId);
+          if (devInfo) {
+            targetItems.push({
+              devInfo,
+              action: item.action || globalAction,
+              mode: item.mode || globalMode,
+            });
+          }
+        } else {
+          const devInfo = resolveDevice(item);
+          if (devInfo) {
+            targetItems.push({
+              devInfo,
+              action: globalAction,
+              mode: globalMode,
+            });
+          }
+        }
+      }
+    } else {
+      // 8.4. ĐIỀU KHIỂN 1 THIẾT BỊ ĐƠN LẺ THEO ID HOẶC TÊN
+      const devInfo = resolveDevice(rawDevice);
+      if (!devInfo) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'Tham số device/id không hợp lệ (hỗ trợ ID: 1, 2, 3, 4; tên: led1, led2, led3, led4, ac, fan, light, alarm; hoặc: all)',
+        });
+      }
+      targetItems.push({
+        devInfo,
+        action: globalAction,
+        mode: globalMode,
       });
     }
 
-    const actionBool = mode === 'auto' ? true : parseActionFlag(action);
-    if (mode !== 'auto' && actionBool === null) {
+    if (!targetItems.length) {
       return res.status(400).json({
         success: false,
-        message: 'Tham số action không hợp lệ (hỗ trợ: ON, OFF, true, false)',
+        message: 'Không tìm thấy thiết bị hợp lệ để điều khiển',
       });
+    }
+
+    // Validate cờ action cho từng thiết bị
+    for (const item of targetItems) {
+      const actionBool = item.mode === 'auto' ? true : parseActionFlag(item.action);
+      if (item.mode !== 'auto' && actionBool === null) {
+        return res.status(400).json({
+          success: false,
+          message: `Tham số action cho thiết bị ${item.devInfo.name} không hợp lệ (hỗ trợ: ON, OFF, true, false, 1, 0)`,
+        });
+      }
+      item.actionBool = actionBool;
+      item.actionLabel = item.mode === 'auto' ? 'AUTO' : actionBool ? 'ON' : 'OFF';
     }
 
     const startTimeMs = Date.now();
     const sentDate = new Date(startTimeMs);
     const sentTime = formatLocalTimestamp(sentDate);
     const sentTimeMsStr = formatLocalTimestamp(sentDate, true);
-    const actionLabel = mode === 'auto' ? 'AUTO' : actionBool ? 'ON' : 'OFF';
 
     const payloadObj = {};
-    if (mode === 'auto') {
-      payloadObj[`${devInfo.key}_auto`] = true;
-    } else {
-      payloadObj[devInfo.key] = actionBool;
+    const results = [];
+
+    // Nếu là lệnh "all", bổ sung thêm cờ "all" hoặc "all_auto" vào gói tin MQTT
+    if (isAllDevice) {
+      const firstActionBool = targetItems[0].actionBool;
+      if (globalMode === 'auto') {
+        payloadObj.all_auto = true;
+      } else {
+        payloadObj.all = firstActionBool;
+      }
     }
+
+    for (const item of targetItems) {
+      const { devInfo, actionBool, actionLabel, mode } = item;
+      const isAuto = mode === 'auto';
+      const dbMode = isAuto ? 'Auto' : 'Manual';
+
+      if (isAuto) {
+        payloadObj[`${devInfo.key}_auto`] = true;
+      } else {
+        payloadObj[devInfo.key] = actionBool;
+      }
+
+      latestDevices[devInfo.key].auto = isAuto;
+
+      await pool.query(`UPDATE Devices SET mode = ? WHERE device_id = ?`, [dbMode, devInfo.dbId]);
+
+      const [insertRes] = await pool.query(
+        `INSERT INTO Action_history (action_type, status, user_id, device_id, created_at, activation_time, response_time)
+         VALUES (?, 'LOADING', ?, ?, ?, ?, NULL)`,
+        [actionLabel, req.user?.id || 1, devInfo.dbId, sentTimeMsStr, sentTimeMsStr]
+      );
+
+      const logId = Number(insertRes.insertId);
+      const commandId = `${devInfo.key}_${startTimeMs}_${logId}`;
+
+      pendingCommands.set(commandId, {
+        logId,
+        device: devInfo.key,
+        dbId: devInfo.dbId,
+        deviceName: devInfo.name,
+        deviceType: devInfo.type,
+        action: actionLabel,
+        sentTime,
+        startTime: startTimeMs,
+      });
+
+      io.emit('action_created', {
+        id: logId,
+        device: devInfo.key,
+        action: actionLabel,
+        status: 'LOADING',
+        sentTime,
+      });
+
+      results.push({
+        device: devInfo.key,
+        device_id: devInfo.dbId,
+        name: devInfo.name,
+        action: actionLabel,
+        logId,
+      });
+    }
+
     const payloadStr = JSON.stringify(payloadObj);
-
-    const dbMode = mode === 'auto' ? 'Auto' : 'Manual';
-    latestDevices[devInfo.key].auto = mode === 'auto';
-
-    await pool.query(`UPDATE Devices SET mode = ? WHERE device_id = ?`, [dbMode, devInfo.dbId]);
-
-    const [insertRes] = await pool.query(
-      `INSERT INTO Action_history (action_type, status, user_id, device_id, created_at, activation_time, response_time)
-       VALUES (?, 'LOADING', ?, ?, ?, ?, NULL)`,
-      [actionLabel, req.user.id, devInfo.dbId, sentTimeMsStr, sentTimeMsStr]
-    );
-
-    const logId = Number(insertRes.insertId);
-    const commandId = `${devInfo.key}_${startTimeMs}_${logId}`;
-
-    pendingCommands.set(commandId, {
-      logId,
-      device: devInfo.key,
-      dbId: devInfo.dbId,
-      deviceName: devInfo.name,
-      deviceType: devInfo.type,
-      action: actionLabel,
-      sentTime,
-      startTime: startTimeMs,
-    });
-
-    io.emit('action_created', { id: logId, device: devInfo.key, action: actionLabel, status: 'LOADING', sentTime });
 
     if (!systemStatus.mqttConnected) {
       return res.status(503).json({
         success: false,
-        logId,
         message: 'Backend chưa kết nối được MQTT Broker nên chưa thể gửi lệnh xuống ESP32',
+        results,
       });
     }
 
     mqttClient.publish(TOPIC_CONTROL, payloadStr, { qos: 1 }, async (err) => {
       if (err) {
-        pendingCommands.delete(commandId);
-        await pool.query(`UPDATE Action_history SET status = 'ERROR' WHERE action_id = ?`, [logId]).catch(() => {});
+        for (const r of results) {
+          const commandId = `${r.device}_${startTimeMs}_${r.logId}`;
+          pendingCommands.delete(commandId);
+          await pool.query(`UPDATE Action_history SET status = 'ERROR' WHERE action_id = ?`, [r.logId]).catch(() => {});
+        }
         console.error(`❌ [MQTT] Không thể gửi lệnh tới ${TOPIC_CONTROL}:`, err.message);
         return res.status(500).json({ success: false, message: 'Lỗi MQTT publish' });
       }
@@ -1416,23 +1561,67 @@ async function handleControlRequest(req, res) {
         mqttClient.publish(`ecoliving/${TOPIC_CONTROL}`, payloadStr, { qos: 1 }, () => {});
       }
 
+      // Trả về JSON tương thích cả single lẫn batch
+      if (targetItems.length === 1 && !isAllDevice) {
+        const single = results[0];
+        return res.json({
+          success: true,
+          logId: single.logId,
+          device: single.device,
+          device_id: single.device_id,
+          name: single.name,
+          action: single.action,
+          payload: payloadObj,
+          sentTime,
+          message: `Đã gửi lệnh điều khiển ${single.name} (${single.action}) xuống ESP32`,
+        });
+      }
+
       return res.json({
         success: true,
-        logId,
-        message: 'Đã gửi lệnh điều khiển xuống ESP32',
-        device: devInfo.key,
-        action: actionLabel,
+        message: isAllDevice
+          ? `Đã gửi lệnh ${results[0].action === 'ON' ? 'BẬT' : results[0].action === 'OFF' ? 'TẮT' : results[0].action} TẤT CẢ các LED xuống ESP32`
+          : `Đã gửi lệnh điều khiển ${results.length} LED theo ID xuống ESP32`,
+        isAll: isAllDevice,
+        count: results.length,
+        devices: results.map((r) => r.device),
+        device_ids: results.map((r) => r.device_id),
+        results,
         payload: payloadObj,
         sentTime,
       });
     });
   } catch (err) {
     console.error('❌ [Control] Lỗi xử lý điều khiển:', err.message);
-    return res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xử lý lệnh điều khiển' });
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xử lý lệnh điều khiển: ' + err.message });
   }
 }
 
+// Đăng ký toàn bộ các endpoint điều khiển linh hoạt:
+app.post(['/api/control/all', '/api/devices/all'], requireApiKey, handleControlRequest);
+app.post(['/api/control/batch', '/api/devices/batch'], requireApiKey, handleControlRequest);
+
+// Endpoint GET tiện lợi để test nhanh trên trình duyệt / Postman:
+app.get(['/api/control/all/on', '/api/devices/all/on'], requireApiKey, (req, res, next) => {
+  req.body = { action: 'ON' };
+  return handleControlRequest(req, res, next);
+});
+app.get(['/api/control/all/off', '/api/devices/all/off'], requireApiKey, (req, res, next) => {
+  req.body = { action: 'OFF' };
+  return handleControlRequest(req, res, next);
+});
+app.get(['/api/devices/:id/on', '/api/control/:id/on'], requireApiKey, (req, res, next) => {
+  req.body = { action: 'ON' };
+  return handleControlRequest(req, res, next);
+});
+app.get(['/api/devices/:id/off', '/api/control/:id/off'], requireApiKey, (req, res, next) => {
+  req.body = { action: 'OFF' };
+  return handleControlRequest(req, res, next);
+});
+
+// Endpoint chuẩn RESTful:
 app.post(['/api/control', '/api/control.php'], requireApiKey, handleControlRequest);
+app.post(['/api/devices/:id/control', '/api/devices/:id'], requireApiKey, handleControlRequest);
 app.put(['/api/devices/:id/control', '/api/devices/:id'], requireApiKey, handleControlRequest);
 app.patch(['/api/devices/:id/control', '/api/devices/:id'], requireApiKey, handleControlRequest);
 

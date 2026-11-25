@@ -341,21 +341,71 @@ export async function fetchActionHistory(params: ActionHistoryParams = {}): Prom
   return { records, pagination: json.pagination };
 }
 
-export async function sendDeviceControl(device: string, action: boolean, performedBy?: string) {
+export async function sendDeviceControl(
+  device: string | number,
+  action: boolean,
+  performedBy?: string,
+  mode: "manual" | "auto" = "manual",
+) {
   return apiFetch<{
     success: boolean;
     logId: number;
     message: string;
     device: string;
+    device_id?: number;
     action: string;
     sentTime: string;
   }>("/api/control", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      device,
+      device: typeof device === "number" ? device : device,
+      id: typeof device === "number" ? device : undefined,
       action: action ? "ON" : "OFF",
+      mode,
       performedBy,
+    }),
+  });
+}
+
+export async function sendControlAll(action: boolean, mode: "manual" | "auto" = "manual") {
+  return apiFetch<{
+    success: boolean;
+    message: string;
+    isAll: boolean;
+    count: number;
+    devices: string[];
+    device_ids: number[];
+    sentTime: string;
+  }>("/api/control/all", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: action ? "ON" : "OFF",
+      mode,
+    }),
+  });
+}
+
+export async function sendControlByIds(
+  ids: (number | string)[],
+  action: boolean,
+  mode: "manual" | "auto" = "manual",
+) {
+  return apiFetch<{
+    success: boolean;
+    message: string;
+    count: number;
+    devices: string[];
+    device_ids: number[];
+    sentTime: string;
+  }>("/api/control/batch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ids,
+      action: action ? "ON" : "OFF",
+      mode,
     }),
   });
 }

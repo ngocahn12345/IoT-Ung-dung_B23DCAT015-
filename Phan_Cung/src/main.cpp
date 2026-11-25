@@ -169,45 +169,68 @@ void callback(char *topic, byte *payload, unsigned int length) {
   }
 
   bool value;
+
+  // 1. Lệnh điều khiển TẤT CẢ các LED (Bật tất cả / Tắt tất cả)
+  if (jsonBool(message, "all", value) || jsonBool(message, "ALL", value) ||
+      jsonBool(message, "all_leds", value)) {
+    led1Auto = false;
+    led2Auto = false;
+    led3Auto = false;
+    led4Auto = false;
+    digitalWrite(LED_1, value ? HIGH : LOW);
+    digitalWrite(LED_2, value ? HIGH : LOW);
+    digitalWrite(LED_3, value ? HIGH : LOW);
+    digitalWrite(LED_4, value ? HIGH : LOW);
+  }
+  if (jsonAuto(message, "ALL") || jsonAuto(message, "all") ||
+      jsonBool(message, "all_auto", value) || jsonBool(message, "ALL_AUTO", value)) {
+    led1Auto = true;
+    led2Auto = true;
+    led3Auto = true;
+    led4Auto = true;
+  }
+
+  // 2. Chế độ Auto riêng cho từng LED
   if (jsonBool(message, "led1_auto", value) ||
-      jsonBool(message, "LED1_AUTO", value))
+      jsonBool(message, "LED1_AUTO", value) || jsonBool(message, "1_auto", value))
     led1Auto = value;
   if (jsonBool(message, "led2_auto", value) ||
-      jsonBool(message, "LED2_AUTO", value))
+      jsonBool(message, "LED2_AUTO", value) || jsonBool(message, "2_auto", value))
     led2Auto = value;
   if (jsonBool(message, "led3_auto", value) ||
-      jsonBool(message, "LED3_AUTO", value))
+      jsonBool(message, "LED3_AUTO", value) || jsonBool(message, "3_auto", value))
     led3Auto = value;
   if (jsonBool(message, "led4_auto", value) ||
-      jsonBool(message, "LED4_AUTO", value))
+      jsonBool(message, "LED4_AUTO", value) || jsonBool(message, "4_auto", value))
     led4Auto = value;
 
-  if (jsonAuto(message, "LED1") || jsonAuto(message, "led1"))
+  if (jsonAuto(message, "LED1") || jsonAuto(message, "led1") || jsonAuto(message, "1"))
     led1Auto = true;
-  if (jsonAuto(message, "LED2") || jsonAuto(message, "led2"))
+  if (jsonAuto(message, "LED2") || jsonAuto(message, "led2") || jsonAuto(message, "2"))
     led2Auto = true;
-  if (jsonAuto(message, "LED3") || jsonAuto(message, "led3"))
+  if (jsonAuto(message, "LED3") || jsonAuto(message, "led3") || jsonAuto(message, "3"))
     led3Auto = true;
-  if (jsonAuto(message, "LED4") || jsonAuto(message, "led4"))
+  if (jsonAuto(message, "LED4") || jsonAuto(message, "led4") || jsonAuto(message, "4"))
     led4Auto = true;
 
-  if (!jsonAuto(message, "LED1") && !jsonAuto(message, "led1") &&
-      (jsonBool(message, "led1", value) || jsonBool(message, "LED1", value))) {
+  // 3. Điều khiển thủ công theo tên LED hoặc ID LED (1, 2, 3, 4)
+  if (!jsonAuto(message, "LED1") && !jsonAuto(message, "led1") && !jsonAuto(message, "1") &&
+      (jsonBool(message, "led1", value) || jsonBool(message, "LED1", value) || jsonBool(message, "1", value))) {
     led1Auto = false;
     digitalWrite(LED_1, value ? HIGH : LOW);
   }
-  if (!jsonAuto(message, "LED2") && !jsonAuto(message, "led2") &&
-      (jsonBool(message, "led2", value) || jsonBool(message, "LED2", value))) {
+  if (!jsonAuto(message, "LED2") && !jsonAuto(message, "led2") && !jsonAuto(message, "2") &&
+      (jsonBool(message, "led2", value) || jsonBool(message, "LED2", value) || jsonBool(message, "2", value))) {
     led2Auto = false;
     digitalWrite(LED_2, value ? HIGH : LOW);
   }
-  if (!jsonAuto(message, "LED3") && !jsonAuto(message, "led3") &&
-      (jsonBool(message, "led3", value) || jsonBool(message, "LED3", value))) {
+  if (!jsonAuto(message, "LED3") && !jsonAuto(message, "led3") && !jsonAuto(message, "3") &&
+      (jsonBool(message, "led3", value) || jsonBool(message, "LED3", value) || jsonBool(message, "3", value))) {
     led3Auto = false;
     digitalWrite(LED_3, value ? HIGH : LOW);
   }
-  if (!jsonAuto(message, "LED4") && !jsonAuto(message, "led4") &&
-      (jsonBool(message, "led4", value) || jsonBool(message, "LED4", value))) {
+  if (!jsonAuto(message, "LED4") && !jsonAuto(message, "led4") && !jsonAuto(message, "4") &&
+      (jsonBool(message, "led4", value) || jsonBool(message, "LED4", value) || jsonBool(message, "4", value))) {
     led4Auto = false;
     digitalWrite(LED_4, value ? HIGH : LOW);
   }
