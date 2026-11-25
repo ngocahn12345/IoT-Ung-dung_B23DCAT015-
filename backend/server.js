@@ -96,9 +96,10 @@ const DEVICE_SPECS = {
   led1: { dbId: 1, key: 'led1', name: 'Điều hòa (LED 1)', type: 'AC', uiId: 'ac_1', gpio: 'GPIO 5' },
   led2: { dbId: 2, key: 'led2', name: 'Quạt thông gió (LED 2)', type: 'FAN', uiId: 'fan_1', gpio: 'GPIO 6' },
   led3: { dbId: 3, key: 'led3', name: 'Đèn chiếu sáng (LED 3)', type: 'LIGHT', uiId: 'led_1', gpio: 'GPIO 7' },
+  led4: { dbId: 4, key: 'led4', name: 'Đèn cảnh báo (LED 4)', type: 'LIGHT', uiId: 'led_4', gpio: 'GPIO 3' },
 };
 
-const DEVICE_KEY_BY_DB_ID = { 1: 'led1', 2: 'led2', 3: 'led3' };
+const DEVICE_KEY_BY_DB_ID = { 1: 'led1', 2: 'led2', 3: 'led3', 4: 'led4' };
 
 const DEVICE_ALIASES = {
   '1': 'led1',
@@ -117,6 +118,12 @@ const DEVICE_ALIASES = {
   led_1: 'led3',
   den: 'led3',
   light: 'led3',
+  '4': 'led4',
+  led4: 'led4',
+  led_4: 'led4',
+  canhbao: 'led4',
+  canh_bao: 'led4',
+  alarm: 'led4',
 };
 
 function resolveDevice(rawDevice) {
@@ -139,6 +146,7 @@ const SENSOR_IDS = {
   TEMPERATURE: 1,
   HUMIDITY: 2,
   LIGHT: 3,
+  GAS: 4,
 };
 
 // ==========================================
@@ -158,9 +166,11 @@ let latestSensors = {
   temperature: null,
   humidity: null,
   light: null,
+  gas: null,
   tempStatus: 'NORMAL',
   humStatus: 'NORMAL',
   luxStatus: 'NORMAL',
+  gasStatus: 'NORMAL',
   timestamp: null,
   hasData: false,
 };
@@ -169,6 +179,7 @@ const latestDevices = {
   led1: { key: 'led1', uiId: 'ac_1', name: 'Điều hòa (LED 1)', type: 'AC', state: 'OFF', auto: true, lastUpdated: null },
   led2: { key: 'led2', uiId: 'fan_1', name: 'Quạt thông gió (LED 2)', type: 'FAN', state: 'OFF', auto: true, lastUpdated: null },
   led3: { key: 'led3', uiId: 'led_1', name: 'Đèn chiếu sáng (LED 3)', type: 'LIGHT', state: 'OFF', auto: true, lastUpdated: null },
+  led4: { key: 'led4', uiId: 'led_4', name: 'Đèn cảnh báo (LED 4)', type: 'LIGHT', state: 'OFF', auto: true, lastUpdated: null },
 };
 
 let hasInitialDeviceSnapshot = false;
@@ -365,7 +376,8 @@ async function initDatabase() {
     VALUES
       (1, 'Điều hòa (LED 1)', 'OFF', 'Auto', 'AC', 'Đầu ra led1 trên GPIO 5 (ESP32-C3)'),
       (2, 'Quạt thông gió (LED 2)', 'OFF', 'Auto', 'FAN', 'Đầu ra led2 trên GPIO 6 (ESP32-C3)'),
-      (3, 'Đèn chiếu sáng (LED 3)', 'OFF', 'Auto', 'LIGHT', 'Đầu ra led3 trên GPIO 7 (ESP32-C3)')
+      (3, 'Đèn chiếu sáng (LED 3)', 'OFF', 'Auto', 'LIGHT', 'Đầu ra led3 trên GPIO 7 (ESP32-C3)'),
+      (4, 'Đèn cảnh báo (LED 4)', 'OFF', 'Auto', 'LIGHT', 'Đầu ra led4 trên GPIO 3 (ESP32-C3)')
   `);
 
   await pool.query(`
@@ -373,7 +385,8 @@ async function initDatabase() {
     VALUES
       (1, 'DHT11 (Nhiệt độ)', 'Phòng 1 (Phòng Khách)', 'TEMPERATURE', 'NORMAL', '°C', 'Cảm biến nhiệt độ DHT11 nối chân GPIO 1'),
       (2, 'DHT11 (Độ ẩm)', 'Phòng 1 (Phòng Khách)', 'HUMIDITY', 'NORMAL', '%', 'Cảm biến độ ẩm DHT11 nối chân GPIO 1'),
-      (3, 'BH1750 (Ánh sáng)', 'Phòng 1 (Phòng Khách)', 'LIGHT', 'NORMAL', 'Lux', 'Cảm biến cường độ ánh sáng BH1750 I2C (SDA GPIO 8, SCL GPIO 9)')
+      (3, 'BH1750 (Ánh sáng)', 'Phòng 1 (Phòng Khách)', 'LIGHT', 'NORMAL', 'Lux', 'Cảm biến cường độ ánh sáng BH1750 I2C (SDA GPIO 8, SCL GPIO 9)'),
+      (4, 'MQ-2 (Khí Gas)', 'Phòng 1 (Phòng Khách)', 'GAS', 'NORMAL', 'ppm', 'Cảm biến nồng độ khí gas / ngẫu nhiên từ ESP32')
   `);
 
   systemStatus.databaseConnected = true;
@@ -405,9 +418,11 @@ async function loadLatestSensorsFromDb() {
       temperature: null,
       humidity: null,
       light: null,
+      gas: null,
       tempStatus: 'NORMAL',
       humStatus: 'NORMAL',
       luxStatus: 'NORMAL',
+      gasStatus: 'NORMAL',
       timestamp: null,
       hasData: false,
     };
@@ -418,15 +433,18 @@ async function loadLatestSensorsFromDb() {
   const tempRow = byType.TEMPERATURE;
   const humRow = byType.HUMIDITY;
   const lightRow = byType.LIGHT;
+  const gasRow = byType.GAS;
 
   latestSensors = {
     temperature: tempRow ? Number(tempRow.value) : null,
     humidity: humRow ? Number(humRow.value) : null,
     light: lightRow ? Number(lightRow.value) : null,
+    gas: gasRow ? Number(gasRow.value) : null,
     tempStatus: tempRow ? tempRow.status : 'NORMAL',
     humStatus: humRow ? humRow.status : 'NORMAL',
     luxStatus: lightRow ? lightRow.status : 'NORMAL',
-    timestamp: (tempRow || humRow || lightRow).created_at,
+    gasStatus: gasRow ? gasRow.status : 'NORMAL',
+    timestamp: (tempRow || humRow || lightRow || gasRow)?.created_at || null,
     hasData: true,
   };
   return latestSensors;
@@ -435,7 +453,7 @@ async function loadLatestSensorsFromDb() {
 async function loadLatestDevicesFromDb() {
   if (!pool) return latestDevices;
   const [rows] = await pool.query(
-    `SELECT device_id, status, mode, DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at FROM Devices WHERE device_id IN (1, 2, 3)`
+    `SELECT device_id, status, mode, DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at FROM Devices WHERE device_id IN (1, 2, 3, 4)`
   );
   for (const row of rows) {
     const key = DEVICE_KEY_BY_DB_ID[row.device_id];
@@ -489,6 +507,15 @@ function evaluateAlerts(sensors) {
       tone: 'warning',
       title: 'Ánh sáng yếu',
       message: `Cường độ ánh sáng hiện tại ${Math.round(sensors.light)} Lux (< 100 Lux).`,
+    });
+  }
+
+  if (typeof sensors.gas === 'number' && sensors.gas > 400) {
+    alerts.push({
+      id: 'gas-critical',
+      tone: 'critical',
+      title: 'Cảnh báo nồng độ khí Gas cao',
+      message: `Khí Gas đạt ${sensors.gas.toFixed(1)} ppm (> 400 ppm). Đèn cảnh báo (LED 4) đã kích hoạt!`,
     });
   }
 
@@ -683,6 +710,7 @@ mqttClient.on('message', async (topic, payloadBuffer) => {
       const temp = parseFloat(data.tem ?? data.temperature);
       const humid = parseFloat(data.humid ?? data.humidity);
       const lux = parseFloat(data.lux ?? data.light);
+      const gas = parseFloat(data.gas ?? data.smoke ?? data.random_sensor ?? (250 + Math.random() * 200));
 
       if (Number.isNaN(temp) || Number.isNaN(humid) || Number.isNaN(lux)) {
         console.warn(`⚠️ [MQTT] Gói tin thiếu chỉ số hợp lệ: ${payloadStr}`);
@@ -692,36 +720,41 @@ mqttClient.on('message', async (topic, payloadBuffer) => {
       const tempStatus = temp > 35 ? 'CRITICAL' : temp > 28 ? 'WARNING' : 'NORMAL';
       const humStatus = humid > 85 ? 'CRITICAL' : humid > 70 ? 'WARNING' : 'NORMAL';
       const luxStatus = lux < 100 || lux > 1000 ? 'WARNING' : 'NORMAL';
+      const gasStatus = gas > 400 ? 'CRITICAL' : gas > 350 ? 'WARNING' : 'NORMAL';
 
       latestSensors = {
         temperature: temp,
         humidity: humid,
         light: lux,
+        gas,
         tempStatus,
         humStatus,
         luxStatus,
+        gasStatus,
         timestamp: timestampStr,
         hasData: true,
       };
 
       console.log(
-        `🌡️ [ESP32 -> Cảm biến]: Nhiệt độ: ${temp.toFixed(1)}°C | Độ ẩm: ${humid.toFixed(1)}% | Ánh sáng: ${lux.toFixed(0)} lx`
+        `🌡️ [ESP32 -> Cảm biến]: Nhiệt độ: ${temp.toFixed(1)}°C | Độ ẩm: ${humid.toFixed(1)}% | Ánh sáng: ${lux.toFixed(0)} lx | Khí Gas: ${gas.toFixed(1)} ppm`
       );
 
       if (pool) {
         await pool.query(
           `INSERT INTO DataSensor (value, timestamp, sensor_id, alert_status)
-           VALUES (?, ?, ?, ?), (?, ?, ?, ?), (?, ?, ?, ?)`,
+           VALUES (?, ?, ?, ?), (?, ?, ?, ?), (?, ?, ?, ?), (?, ?, ?, ?)`,
           [
             temp, timestampStr, SENSOR_IDS.TEMPERATURE, tempStatus,
             humid, timestampStr, SENSOR_IDS.HUMIDITY, humStatus,
             lux, timestampStr, SENSOR_IDS.LIGHT, luxStatus,
+            gas, timestampStr, SENSOR_IDS.GAS, gasStatus,
           ]
         );
         await Promise.all([
           pool.query(`UPDATE Sensors SET status = ? WHERE sensor_id = ?`, [tempStatus, SENSOR_IDS.TEMPERATURE]),
           pool.query(`UPDATE Sensors SET status = ? WHERE sensor_id = ?`, [humStatus, SENSOR_IDS.HUMIDITY]),
           pool.query(`UPDATE Sensors SET status = ? WHERE sensor_id = ?`, [luxStatus, SENSOR_IDS.LIGHT]),
+          pool.query(`UPDATE Sensors SET status = ? WHERE sensor_id = ?`, [gasStatus, SENSOR_IDS.GAS]),
         ]);
       }
 
@@ -734,6 +767,7 @@ mqttClient.on('message', async (topic, payloadBuffer) => {
           temp,
           hum: humid,
           lux,
+          gas,
         },
       });
     } catch (err) {
@@ -757,9 +791,10 @@ mqttClient.on('message', async (topic, payloadBuffer) => {
         led1: latestDevices.led1.state,
         led2: latestDevices.led2.state,
         led3: latestDevices.led3.state,
+        led4: latestDevices.led4.state,
       };
 
-      for (const devKey of ['led1', 'led2', 'led3']) {
+      for (const devKey of ['led1', 'led2', 'led3', 'led4']) {
         const upper = devKey.toUpperCase();
         if (data[upper]) {
           latestDevices[devKey].state = data[upper] === 'ON' ? 'ON' : 'OFF';
@@ -809,7 +844,7 @@ mqttClient.on('message', async (topic, payloadBuffer) => {
 
       // Ghi nhận nếu ESP32 tự động thay đổi trạng thái theo ngưỡng (không phải lệnh từ web)
       if (hasInitialDeviceSnapshot) {
-        for (const devKey of ['led1', 'led2', 'led3']) {
+        for (const devKey of ['led1', 'led2', 'led3', 'led4']) {
           const newState = latestDevices[devKey].state;
           if (!matchedDevices.has(devKey) && newState !== prevStates[devKey]) {
             const spec = DEVICE_SPECS[devKey];
@@ -1249,7 +1284,7 @@ app.get(['/api/actions/history', '/api/actions.php', '/api/actions/logs'], requi
     const [rows] = await pool.query(
       `SELECT
          ah.action_id AS id,
-         CASE ah.device_id WHEN 1 THEN 'led1' WHEN 2 THEN 'led2' ELSE 'led3' END AS device_id,
+         CASE ah.device_id WHEN 1 THEN 'led1' WHEN 2 THEN 'led2' WHEN 3 THEN 'led3' WHEN 4 THEN 'led4' ELSE CONCAT('dev_', ah.device_id) END AS device_id,
          d.device_name AS device_name,
          d.device_type AS device_type,
          ah.action_type AS action,
@@ -1304,7 +1339,7 @@ async function handleControlRequest(req, res) {
     if (!devInfo) {
       return res.status(400).json({
         success: false,
-        message: 'Tham số device không hợp lệ (hỗ trợ: led1, led2, led3, ac_1, fan_1, led_1)',
+        message: 'Tham số device không hợp lệ (hỗ trợ: led1, led2, led3, led4, ac_1, fan_1, led_1, led_4)',
       });
     }
 

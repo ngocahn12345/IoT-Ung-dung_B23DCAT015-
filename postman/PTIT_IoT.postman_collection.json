@@ -640,7 +640,7 @@
                 {
                   "key": "device",
                   "value": "ALL",
-                  "description": "ALL | led1 | led2 | led3 | FAN | LIGHT | AC"
+                  "description": "ALL | led1 | led2 | led3 | led4 | FAN | LIGHT | AC"
                 },
                 {
                   "key": "action",

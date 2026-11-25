@@ -214,6 +214,7 @@ export function SensorsTab() {
               <option value="TEMPERATURE">Cảm biến Nhiệt độ</option>
               <option value="HUMIDITY">Cảm biến Độ ẩm</option>
               <option value="LIGHT">Cảm biến Ánh sáng</option>
+              <option value="GAS">Cảm biến Khí Gas (MQ-2)</option>
               <option value="TIME">Thời gian</option>
             </select>
           </div>

@@ -199,6 +199,7 @@ export function ActionHistoryTab() {
               <option value="FAN">Quạt (LED 2)</option>
               <option value="LIGHT">Đèn (LED 3)</option>
               <option value="AC">Điều hòa (LED 1)</option>
+              <option value="led4">Đèn cảnh báo (LED 4)</option>
             </select>
           </div>
 

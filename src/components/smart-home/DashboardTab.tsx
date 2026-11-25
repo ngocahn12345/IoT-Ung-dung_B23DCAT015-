@@ -27,7 +27,7 @@ import { sendDeviceControl } from "@/lib/api";
 import { useIoT } from "./IoTContext";
 
 export interface DeviceState {
-  id: "led1" | "led2" | "led3";
+  id: "led1" | "led2" | "led3" | "led4";
   name: string;
   subtitle: string;
   type: "FAN" | "LIGHT" | "AC";
@@ -92,6 +92,13 @@ export function DashboardTab() {
       subtitle: "GPIO 5 · LED 1",
       type: "AC",
       on: devices?.led1?.state === "ON",
+    },
+    {
+      id: "led4",
+      name: "Đèn cảnh báo",
+      subtitle: "GPIO 3 · LED 4",
+      type: "LIGHT",
+      on: devices?.led4?.state === "ON",
     },
   ];
 

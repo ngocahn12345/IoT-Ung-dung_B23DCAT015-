@@ -10,9 +10,9 @@ Backend được thiết kế để kết nối trực tiếp với code ESP32 t
 
 | Topic | Hướng truyền | Payload JSON | Ý nghĩa |
 | :--- | :--- | :--- | :--- |
-| `ssdata` | ESP32 ➔ Backend | `{"tem": 28.5, "humid": 70.0, "lux": 450.0}` | Dữ liệu đo từ DHT11 và BH1750 (mỗi 3 giây) |
-| `dvcontrol` | Backend ➔ ESP32 | `{"led1": true}` hoặc `{"led1_auto": true}` | Lệnh điều khiển bật/tắt relay đèn |
-| `dvrespond` | ESP32 ➔ Backend | `{"LED1": "ON", "LED2": "OFF", "LED3": "OFF"}` | Xác nhận trạng thái thực tế (Hardware ACK) |
+| `ssdata` | ESP32 ➔ Backend | `{"tem": 28.5, "humid": 70.0, "lux": 450.0, "gas": 320.0}` | Dữ liệu đo từ DHT11, BH1750 và Cảm biến Khí Gas (mỗi 3 giây) |
+| `dvcontrol` | Backend ➔ ESP32 | `{"led4": true}` hoặc `{"led4_auto": true}` | Lệnh điều khiển bật/tắt relay đèn (hỗ trợ led1, led2, led3, led4) |
+| `dvrespond` | ESP32 ➔ Backend | `{"LED1": "ON", "LED2": "OFF", "LED3": "OFF", "LED4": "OFF"}` | Xác nhận trạng thái thực tế (Hardware ACK) |
 
 ---
 
@@ -66,7 +66,7 @@ Script này sẽ giả lập phát các gói tin cảm biến và phản hồi l
   "performedBy": "Người dùng (Ngọc Anh)"
 }
 ```
-*(Hỗ trợ `led1`, `led2`, `led3`).*
+*(Hỗ trợ `led1`, `led2`, `led3`, `led4`).*
 
 ---
 

@@ -23,6 +23,7 @@ const char* topic_respond = "dvrespond";
 #define LED_1 5
 #define LED_2 6
 #define LED_3 7
+#define LED_4 3
 
 // Đối tượng phần cứng & mạng
 BH1750 lightMeter;
@@ -35,6 +36,7 @@ bool bh1750Ready = false;
 bool led1Auto = true;
 bool led2Auto = true;
 bool led3Auto = true;
+bool led4Auto = true;
 unsigned long lastRead = 0;
 unsigned long lastBh1750Retry = 0;
 
@@ -42,7 +44,7 @@ void connectWiFi();
 void reconnectMQTT();
 void callback(char* topic, byte* payload, unsigned int length);
 void publishDeviceRespond();
-void controlAutomaticLeds(float temp, float humid, float lux);
+void controlAutomaticLeds(float temp, float humid, float lux, float gas);
 bool initializeBH1750();
 void scanI2C();
 bool jsonBool(const String& message, const char* key, bool& value);
@@ -56,13 +58,15 @@ void setup()
   Serial.println();
   Serial.println("=== ESP32 STARTED ===");
 
-  // Cấu hình chân GPIO cho 3 đèn LED
+  // Cấu hình chân GPIO cho 4 đèn LED (LED 4 nối GPIO 3)
   pinMode(LED_1, OUTPUT);
   pinMode(LED_2, OUTPUT);
   pinMode(LED_3, OUTPUT);
+  pinMode(LED_4, OUTPUT);
   digitalWrite(LED_1, LOW);
   digitalWrite(LED_2, LOW);
   digitalWrite(LED_3, LOW);
+  digitalWrite(LED_4, LOW);
 
   //  Khởi tạo bus I2C, BH1750, DHT
   Wire.begin(SDA_PIN, SCL_PIN);
@@ -109,13 +113,16 @@ void loop()
 
     float lux = bh1750Ready ? lightMeter.readLightLevel() : -2.0;
 
-    Serial.printf("[Sensor] Temp: %.1f *C | Hum: %.1f %% | Lux: %.1f lx\n", temp, humid, lux);
+    // Sinh giá trị cảm biến ngẫu nhiên (Ví dụ: Khí Gas / Khói MQ-2, đơn vị: ppm)
+    float gas = random(200, 520) + (random(0, 100) / 100.0);
+
+    Serial.printf("[Sensor] Temp: %.1f *C | Hum: %.1f %% | Lux: %.1f lx | Gas: %.1f ppm\n", temp, humid, lux, gas);
 
     if (!isnan(temp) && !isnan(humid)) {
-      char buffer[160];
+      char buffer[192];
       snprintf(buffer, sizeof(buffer),
-               "{\"tem\":%.2f,\"humid\":%.2f,\"lux\":%.2f}",
-               temp, humid, lux);
+               "{\"tem\":%.2f,\"humid\":%.2f,\"lux\":%.2f,\"gas\":%.2f}",
+               temp, humid, lux, gas);
       if (client.publish(topic_sensor, buffer)) {
         Serial.println(buffer);
       } else {
@@ -124,7 +131,7 @@ void loop()
       }
     }
 
-    controlAutomaticLeds(temp, humid, lux);
+    controlAutomaticLeds(temp, humid, lux, gas);
   }
 }
 
@@ -166,10 +173,12 @@ void callback(char* topic, byte* payload, unsigned int length)
   if (jsonBool(message, "led1_auto", value) || jsonBool(message, "LED1_AUTO", value)) led1Auto = value;
   if (jsonBool(message, "led2_auto", value) || jsonBool(message, "LED2_AUTO", value)) led2Auto = value;
   if (jsonBool(message, "led3_auto", value) || jsonBool(message, "LED3_AUTO", value)) led3Auto = value;
+  if (jsonBool(message, "led4_auto", value) || jsonBool(message, "LED4_AUTO", value)) led4Auto = value;
 
   if (jsonAuto(message, "LED1") || jsonAuto(message, "led1")) led1Auto = true;
   if (jsonAuto(message, "LED2") || jsonAuto(message, "led2")) led2Auto = true;
   if (jsonAuto(message, "LED3") || jsonAuto(message, "led3")) led3Auto = true;
+  if (jsonAuto(message, "LED4") || jsonAuto(message, "led4")) led4Auto = true;
 
   if (!jsonAuto(message, "LED1") && !jsonAuto(message, "led1") &&
       (jsonBool(message, "led1", value) || jsonBool(message, "LED1", value))) {
@@ -186,6 +195,11 @@ void callback(char* topic, byte* payload, unsigned int length)
     led3Auto = false;
     digitalWrite(LED_3, value ? HIGH : LOW);
   }
+  if (!jsonAuto(message, "LED4") && !jsonAuto(message, "led4") &&
+      (jsonBool(message, "led4", value) || jsonBool(message, "LED4", value))) {
+    led4Auto = false;
+    digitalWrite(LED_4, value ? HIGH : LOW);
+  }
 
   Serial.print("MQTT lenh: ");
   Serial.print(message);
@@ -198,10 +212,11 @@ void callback(char* topic, byte* payload, unsigned int length)
 void publishDeviceRespond()
 {
   char buffer[256];
-  snprintf(buffer, sizeof(buffer), "{\"LED1\":\"%s\",\"LED2\":\"%s\",\"LED3\":\"%s\"}",
+  snprintf(buffer, sizeof(buffer), "{\"LED1\":\"%s\",\"LED2\":\"%s\",\"LED3\":\"%s\",\"LED4\":\"%s\"}",
            digitalRead(LED_1) ? "ON" : "OFF",
            digitalRead(LED_2) ? "ON" : "OFF",
-           digitalRead(LED_3) ? "ON" : "OFF");
+           digitalRead(LED_3) ? "ON" : "OFF",
+           digitalRead(LED_4) ? "ON" : "OFF");
 
   client.publish(topic_respond, buffer, true);
 }
@@ -234,7 +249,7 @@ void connectWiFi()
   Serial.println("WiFi status: CONNECTED");
 }
 
-void controlAutomaticLeds(float temp, float humid, float lux)
+void controlAutomaticLeds(float temp, float humid, float lux, float gas)
 {
   bool changed = false;
 
@@ -261,6 +276,15 @@ void controlAutomaticLeds(float temp, float humid, float lux)
     bool newState = lux < 100.0;
     if (newState != (digitalRead(LED_3) == HIGH)) {
       digitalWrite(LED_3, newState ? HIGH : LOW);
+      changed = true;
+    }
+  }
+
+  // LED 4: Cảm biến ngẫu nhiên (Khí Gas / Khói MQ-2) > 400 ppm thì bật cảnh báo
+  if (led4Auto && !isnan(gas)) {
+    bool newState = gas > 400.0;
+    if (newState != (digitalRead(LED_4) == HIGH)) {
+      digitalWrite(LED_4, newState ? HIGH : LOW);
       changed = true;
     }
   }

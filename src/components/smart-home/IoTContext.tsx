@@ -39,7 +39,7 @@ interface IoTContextValue {
   logout: () => Promise<void>;
   connectivity: SystemConnectivity;
   sensors: LatestSensorsPayload | null;
-  devices: Record<"led1" | "led2" | "led3", BackendDeviceState> | null;
+  devices: Record<"led1" | "led2" | "led3" | "led4", BackendDeviceState> | null;
   chartData: ChartPoint[];
   alerts: DashboardAlert[];
   loadingDashboard: boolean;
@@ -64,7 +64,7 @@ export function IoTProvider({ children }: { children: ReactNode }) {
 
   const [sensors, setSensors] = useState<LatestSensorsPayload | null>(null);
   const [devices, setDevices] = useState<Record<
-    "led1" | "led2" | "led3",
+    "led1" | "led2" | "led3" | "led4",
     BackendDeviceState
   > | null>(null);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);

@@ -34,6 +34,7 @@ File cấu hình môi trường Postman đi kèm: `postman/EcoLiving_Local.postm
 | `den` | `led3` | Khóa định danh Đèn chiếu sáng (GPIO 7) |
 | `quat` | `led2` | Khóa định danh Quạt thông gió (GPIO 6) |
 | `dieuhoa` | `led1` | Khóa định danh Điều hòa (GPIO 5) |
+| `canhbao` | `led4` | Khóa định danh Đèn cảnh báo (GPIO 3) |
 
 ---
 

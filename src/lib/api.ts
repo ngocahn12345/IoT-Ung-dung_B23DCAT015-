@@ -30,18 +30,20 @@ export interface LatestSensorsPayload {
   temperature: number | null;
   humidity: number | null;
   light: number | null;
+  gas?: number | null;
   tempStatus: "NORMAL" | "WARNING" | "CRITICAL";
   humStatus: "NORMAL" | "WARNING" | "CRITICAL";
   luxStatus: "NORMAL" | "WARNING" | "CRITICAL";
+  gasStatus?: "NORMAL" | "WARNING" | "CRITICAL";
   timestamp: string | null;
   hasData: boolean;
 }
 
 export interface BackendDeviceState {
-  key: "led1" | "led2" | "led3";
+  key: "led1" | "led2" | "led3" | "led4";
   uiId: string;
   name: string;
-  type: "FAN" | "LIGHT" | "AC";
+  type: "FAN" | "LIGHT" | "AC" | "ALARM";
   state: "ON" | "OFF";
   auto: boolean;
   lastUpdated: string | null;
@@ -53,6 +55,7 @@ export interface ChartPoint {
   temp: number | null;
   hum: number | null;
   lux: number | null;
+  gas?: number | null;
 }
 
 export interface DashboardAlert {
@@ -65,7 +68,7 @@ export interface DashboardAlert {
 export interface DashboardResponse {
   success: boolean;
   sensors: LatestSensorsPayload;
-  devices: Record<"led1" | "led2" | "led3", BackendDeviceState>;
+  devices: Record<"led1" | "led2" | "led3" | "led4", BackendDeviceState>;
   chart: ChartPoint[];
   alerts: DashboardAlert[];
   mqtt: boolean;

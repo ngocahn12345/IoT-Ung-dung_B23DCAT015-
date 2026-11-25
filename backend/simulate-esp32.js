@@ -16,7 +16,7 @@ const client = mqtt.connect(MQTT_BROKER, {
   clientId: 'ESP32_SIMULATOR_B23DCAT015',
 });
 
-let ledState = { LED1: 'OFF', LED2: 'OFF', LED3: 'OFF' };
+let ledState = { LED1: 'OFF', LED2: 'OFF', LED3: 'OFF', LED4: 'OFF' };
 
 client.on('connect', () => {
   console.log('\n🤖 [ESP32 Simulator] Đã kết nối tới broker.hivemq.com!');
@@ -32,11 +32,13 @@ client.on('connect', () => {
     const temp = +(26 + Math.random() * 5).toFixed(1);   // 26 - 31 °C
     const humid = +(60 + Math.random() * 20).toFixed(1); // 60 - 80 %
     const lux = Math.floor(300 + Math.random() * 500);   // 300 - 800 Lux
+    const gas = +(200 + Math.random() * 320).toFixed(1); // 200 - 520 ppm (cảm biến ngẫu nhiên MQ-2)
 
     const payload = JSON.stringify({
       tem: temp,
       humid: humid,
       lux: lux,
+      gas: gas,
     });
 
     client.publish(TOPIC_SENSOR, payload);
@@ -55,6 +57,7 @@ client.on('message', (topic, message) => {
       if (cmd.led1 !== undefined) ledState.LED1 = cmd.led1 ? 'ON' : 'OFF';
       if (cmd.led2 !== undefined) ledState.LED2 = cmd.led2 ? 'ON' : 'OFF';
       if (cmd.led3 !== undefined) ledState.LED3 = cmd.led3 ? 'ON' : 'OFF';
+      if (cmd.led4 !== undefined) ledState.LED4 = cmd.led4 ? 'ON' : 'OFF';
 
       // Giả lập độ trễ phần cứng 50ms rồi gửi Hardware ACK
       setTimeout(() => {

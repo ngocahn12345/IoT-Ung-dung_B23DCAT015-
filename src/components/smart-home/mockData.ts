@@ -1,7 +1,7 @@
 export interface SensorDataRecord {
   id: string;
   sensorName: string;
-  sensorType: "TEMPERATURE" | "HUMIDITY" | "LIGHT";
+  sensorType: "TEMPERATURE" | "HUMIDITY" | "LIGHT" | "GAS" | string;
   room: string;
   value: number;
   unit: string;
@@ -15,8 +15,8 @@ export interface ActionRecord {
   id: string;
   deviceId: string;
   deviceName: string;
-  deviceType: "FAN" | "LIGHT" | "AC";
-  action: "ON" | "OFF";
+  deviceType: "FAN" | "LIGHT" | "AC" | "ALARM" | string;
+  action: "ON" | "OFF" | "AUTO";
   status: "ON" | "OFF" | "LOADING";
   sentTime: string; // TG gửi lệnh (TG bật)
   responseTime: string; // TG phản hồi từ Hardware ACK

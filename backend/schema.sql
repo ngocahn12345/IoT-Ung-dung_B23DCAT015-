@@ -94,3 +94,19 @@ CREATE TABLE IF NOT EXISTS `Action_history` (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Khởi tạo danh sách 4 thiết bị mặc định (bao gồm LED 4 trên GPIO 3)
+INSERT IGNORE INTO `Devices` (`device_id`, `device_name`, `status`, `mode`, `device_type`, `description`)
+VALUES
+  (1, 'Điều hòa (LED 1)', 'OFF', 'Auto', 'AC', 'Đầu ra led1 trên GPIO 5 (ESP32-C3)'),
+  (2, 'Quạt thông gió (LED 2)', 'OFF', 'Auto', 'FAN', 'Đầu ra led2 trên GPIO 6 (ESP32-C3)'),
+  (3, 'Đèn chiếu sáng (LED 3)', 'OFF', 'Auto', 'LIGHT', 'Đầu ra led3 trên GPIO 7 (ESP32-C3)'),
+  (4, 'Đèn cảnh báo (LED 4)', 'OFF', 'Auto', 'LIGHT', 'Đầu ra led4 trên GPIO 3 (ESP32-C3)');
+
+-- Khởi tạo danh sách 4 cảm biến mặc định (bao gồm Cảm biến ngẫu nhiên Khí Gas MQ-2)
+INSERT IGNORE INTO `Sensors` (`sensor_id`, `sensor_name`, `location`, `type`, `status`, `unit`, `description`)
+VALUES
+  (1, 'DHT11 (Nhiệt độ)', 'Phòng 1 (Phòng Khách)', 'TEMPERATURE', 'NORMAL', '°C', 'Cảm biến nhiệt độ DHT11 nối chân GPIO 1'),
+  (2, 'DHT11 (Độ ẩm)', 'Phòng 1 (Phòng Khách)', 'HUMIDITY', 'NORMAL', '%', 'Cảm biến độ ẩm DHT11 nối chân GPIO 1'),
+  (3, 'BH1750 (Ánh sáng)', 'Phòng 1 (Phòng Khách)', 'LIGHT', 'NORMAL', 'Lux', 'Cảm biến cường độ ánh sáng BH1750 I2C (SDA GPIO 8, SCL GPIO 9)'),
+  (4, 'MQ-2 (Khí Gas)', 'Phòng 1 (Phòng Khách)', 'GAS', 'NORMAL', 'ppm', 'Cảm biến nồng độ khí gas / ngẫu nhiên từ ESP32');
+
