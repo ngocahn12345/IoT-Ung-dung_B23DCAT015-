@@ -58,7 +58,7 @@ export interface UserProfileData {
   figma: string;
   apiDocs: string;
   googleDrive: string;
-  pdfReport: string;
+  pdfReport?: string;
   pdfReportName?: string;
   twitter: string;
   skillsBackend: string[];

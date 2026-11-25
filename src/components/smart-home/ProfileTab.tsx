@@ -2,12 +2,10 @@ import { useState, useRef } from "react";
 import {
   Camera,
   CheckCircle2,
-  Download,
   Edit2,
   ExternalLink,
   Figma,
   FileCode2,
-  FileText,
   Github,
   GraduationCap,
   HardDrive,
@@ -23,7 +21,6 @@ export function ProfileTab() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<UserProfileData>(initialProfile);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const pdfInputRef = useRef<HTMLInputElement | null>(null);
   const [activeModalTab, setActiveModalTab] = useState<"personal" | "education" | "links">("personal");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -41,20 +38,6 @@ export function ProfileTab() {
         setProfile((prev) => ({ ...prev, avatarUrl: result }));
         setEditForm((prev) => ({ ...prev, avatarUrl: result }));
         showToast("Đã đổi ảnh đại diện thành công!");
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handlePdfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        setProfile((prev) => ({ ...prev, pdfReport: result, pdfReportName: file.name }));
-        setEditForm((prev) => ({ ...prev, pdfReport: result, pdfReportName: file.name }));
-        showToast(`Đã tải lên tệp PDF "${file.name}" thành công!`);
       };
       reader.readAsDataURL(file);
     }
@@ -83,15 +66,6 @@ export function ProfileTab() {
 
   return (
     <div className="space-y-4">
-      {/* Hidden PDF Input */}
-      <input
-        type="file"
-        ref={pdfInputRef}
-        accept=".pdf,application/pdf"
-        className="hidden"
-        onChange={handlePdfFileChange}
-      />
-
       {/* Header Profile - Compact Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card px-5 py-3.5 shadow-xs">
         <div className="flex items-center gap-3.5">
@@ -571,35 +545,6 @@ export function ProfileTab() {
                         onChange={(e) => setEditForm({ ...editForm, googleDrive: e.target.value })}
                         className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium focus:border-primary focus:outline-none"
                       />
-                    </div>
-                    <div>
-                      <label className="mb-1 block font-semibold text-foreground">
-                        Tệp Báo Cáo PDF:
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder="Dán URL PDF hoặc chọn file từ máy..."
-                          value={editForm.pdfReport || ""}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, pdfReport: e.target.value })
-                          }
-                          className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium focus:border-primary focus:outline-none"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => pdfInputRef.current?.click()}
-                          className="inline-flex items-center gap-1.5 shrink-0 rounded-xl border border-border bg-secondary px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary/80 cursor-pointer"
-                        >
-                          <Upload className="h-3.5 w-3.5 text-primary" />
-                          Up PDF
-                        </button>
-                      </div>
-                      {editForm.pdfReportName && (
-                        <p className="mt-1 text-[11px] text-muted-foreground">
-                          Tệp hiện tại: <span className="font-semibold text-rose-500">{editForm.pdfReportName}</span>
-                        </p>
-                      )}
                     </div>
                   </div>
                 )}
