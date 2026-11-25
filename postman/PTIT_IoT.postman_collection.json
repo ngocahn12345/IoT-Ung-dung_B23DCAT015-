@@ -438,6 +438,205 @@
             },
             "description": "Tắt điều hòa không khí (LED 1 trên chân GPIO 5)"
           }
+        },
+        {
+          "name": "Bật tất cả LED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Bật tất cả LED thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ON\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control/all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control",
+                "all"
+              ]
+            },
+            "description": "Gửi lệnh BẬT đồng loạt cả 4 đèn LED (LED 1 -> LED 4) xuống ESP32"
+          }
+        },
+        {
+          "name": "Tắt tất cả LED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Tắt tất cả LED thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"OFF\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control/all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control",
+                "all"
+              ]
+            },
+            "description": "Gửi lệnh TẮT đồng loạt cả 4 đèn LED (LED 1 -> LED 4) xuống ESP32"
+          }
+        },
+        {
+          "name": "Bật LED theo danh sách ID (Batch)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Điều khiển theo danh sách ID thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [2, 4],\n  \"action\": \"ON\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control/batch",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control",
+                "batch"
+              ]
+            },
+            "description": "Điều khiển đồng thời nhiều LED theo mảng ID (ví dụ: LED 2 và LED 4)"
+          }
+        },
+        {
+          "name": "Bật LED theo ID (LED 4 - ID 4)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Điều khiển LED theo ID thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 4,\n  \"action\": \"ON\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Điều khiển 1 LED theo trường ID thiết bị (Ví dụ: ID 4 - Đèn cảnh báo GPIO 3)"
+          }
         }
       ]
     },
