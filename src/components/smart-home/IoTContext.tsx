@@ -209,9 +209,11 @@ export function IoTProvider({ children }: { children: ReactNode }) {
         temperature: payload.temperature,
         humidity: payload.humidity,
         light: payload.light,
+        gas: payload.gas,
         tempStatus: payload.tempStatus,
         humStatus: payload.humStatus,
         luxStatus: payload.luxStatus,
+        gasStatus: payload.gasStatus,
         timestamp: payload.timestamp,
         hasData: true,
       });
