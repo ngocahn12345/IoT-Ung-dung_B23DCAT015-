@@ -153,7 +153,7 @@ export function SensorsTab() {
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Tìm theo giá trị (vd: >28), từ khóa hoặc ngày (YYYY-MM-DD)..."
+              placeholder="Tìm theo giá trị (vd: >28), loại cảm biến (nhiệt độ, độ ẩm, gas...), từ khóa hoặc ngày..."
               value={searchTermInput}
               onChange={(e) => setSearchTermInput(e.target.value)}
               onKeyDown={(e) => {

@@ -532,7 +532,8 @@ async function getChartPoints(limit = 15) {
       DATE_FORMAT(ds.timestamp, '%Y-%m-%d %H:%i:%s') AS fullTime,
       MAX(CASE WHEN s.type = 'TEMPERATURE' THEN ds.value END) AS temp,
       MAX(CASE WHEN s.type = 'HUMIDITY' THEN ds.value END) AS hum,
-      MAX(CASE WHEN s.type = 'LIGHT' THEN ds.value END) AS lux
+      MAX(CASE WHEN s.type = 'LIGHT' THEN ds.value END) AS lux,
+      MAX(CASE WHEN s.type = 'GAS' THEN ds.value END) AS gas
     FROM DataSensor ds
     INNER JOIN Sensors s ON ds.sensor_id = s.sensor_id
     GROUP BY ds.timestamp
@@ -548,6 +549,7 @@ async function getChartPoints(limit = 15) {
     temp: r.temp !== null ? Number(r.temp) : null,
     hum: r.hum !== null ? Number(r.hum) : null,
     lux: r.lux !== null ? Number(r.lux) : null,
+    gas: r.gas !== null ? Number(r.gas) : null,
   }));
 }
 
@@ -1165,10 +1167,10 @@ app.get(['/api/sensors/history', '/api/sensors.php', '/api/sensors/data'], requi
         params.push(numVal);
       } else {
         whereClause +=
-          " AND (CAST(ds.data_id AS CHAR) LIKE ? OR s.sensor_name LIKE ? OR s.location LIKE ? OR CAST(ds.value AS CHAR) LIKE ? OR s.unit LIKE ? OR DATE_FORMAT(ds.timestamp, '%Y-%m-%d %H:%i:%s') LIKE ?)";
+          " AND (CAST(ds.data_id AS CHAR) LIKE ? OR s.sensor_name LIKE ? OR s.type LIKE ? OR s.location LIKE ? OR CAST(ds.value AS CHAR) LIKE ? OR s.unit LIKE ? OR DATE_FORMAT(ds.timestamp, '%Y-%m-%d %H:%i:%s') LIKE ?)";
         const term = `%${search}%`;
         const dateTerm = `%${isoDateSearch}%`;
-        params.push(term, term, term, term, term, dateTerm);
+        params.push(term, term, term, term, term, term, dateTerm);
       }
     }
 
@@ -1270,9 +1272,9 @@ app.get(['/api/actions/history', '/api/actions.php', '/api/actions/logs'], requi
 
     if (search) {
       whereClause +=
-        " AND (CAST(ah.action_id AS CHAR) LIKE ? OR d.device_name LIKE ? OR COALESCE(u.fullname, 'Hệ thống tự động (ESP32)') LIKE ? OR DATE_FORMAT(ah.activation_time, '%Y-%m-%d %H:%i:%s') LIKE ?)";
+        " AND (CAST(ah.action_id AS CHAR) LIKE ? OR d.device_name LIKE ? OR d.device_type LIKE ? OR ah.action_type LIKE ? OR ah.status LIKE ? OR COALESCE(u.fullname, 'Hệ thống tự động (ESP32)') LIKE ? OR DATE_FORMAT(ah.activation_time, '%Y-%m-%d %H:%i:%s') LIKE ?)";
       const term = `%${search}%`;
-      params.push(term, term, term, term);
+      params.push(term, term, term, term, term, term, term);
     }
 
     const baseFrom =

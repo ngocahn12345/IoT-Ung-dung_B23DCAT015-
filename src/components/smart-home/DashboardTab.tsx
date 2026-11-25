@@ -2,9 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import {
   AirVent,
   AlertCircle,
+  Bell,
   CheckCircle2,
   Droplets,
   Fan,
+  Flame,
   Lightbulb,
   Radio,
   Sun,
@@ -68,6 +70,15 @@ export function DashboardTab() {
       icon: Sun,
       status: sensors?.luxStatus || "NORMAL",
       accentColor: "text-amber-500 bg-amber-500/10",
+    },
+    {
+      id: "gas",
+      name: "Khí Gas (MQ-2)",
+      value: sensors?.gas != null ? sensors.gas.toFixed(1) : "--",
+      unit: "ppm",
+      icon: Flame,
+      status: sensors?.gasStatus || "NORMAL",
+      accentColor: "text-violet-500 bg-violet-500/10",
     },
   ];
 
@@ -207,11 +218,17 @@ export function DashboardTab() {
         </div>
       )}
 
-      {/* Sensor Cards */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 shrink-0">
+      {/* Sensor Cards (4 ô cảm biến ở trên) */}
+      <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-4 shrink-0">
         {sensorCards.map((s) => {
           const chartType =
-            s.id === "temp" ? "TEMPERATURE" : s.id === "humidity" ? "HUMIDITY" : "LIGHT";
+            s.id === "temp"
+              ? "TEMPERATURE"
+              : s.id === "humidity"
+                ? "HUMIDITY"
+                : s.id === "light"
+                  ? "LIGHT"
+                  : "ALL";
           const isSelected = selectedChart === chartType;
           return (
             <button
@@ -219,23 +236,23 @@ export function DashboardTab() {
               type="button"
               onClick={() => setSelectedChart((prev) => (prev === chartType ? "ALL" : chartType))}
               className={cn(
-                "group relative text-left overflow-hidden rounded-2xl border bg-card p-3.5 shadow-xs transition-all duration-200 cursor-pointer",
+                "group relative text-left overflow-hidden rounded-2xl border bg-card p-3 shadow-xs transition-all duration-200 cursor-pointer",
                 isSelected
                   ? "border-primary ring-2 ring-primary/30 shadow-md"
                   : "border-border/80 hover:border-primary/40",
               )}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
+              <div className="flex items-start justify-between gap-2.5">
+                <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-muted-foreground">{s.name}</span>
+                    <span className="text-xs font-medium text-muted-foreground truncate">{s.name}</span>
                     {isSelected && (
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+                      <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                     )}
                     {sensors?.hasData && s.status !== "NORMAL" && (
                       <span
                         className={cn(
-                          "rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                          "rounded-full px-1.5 py-0.5 text-[10px] font-bold shrink-0",
                           s.status === "CRITICAL"
                             ? "bg-destructive/15 text-destructive"
                             : "bg-warning/15 text-warning-foreground",
@@ -246,15 +263,15 @@ export function DashboardTab() {
                     )}
                   </div>
                   <div className="mt-0.5 flex items-baseline gap-1">
-                    <span className="font-display text-3xl font-bold tracking-tight text-foreground">
+                    <span className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                       {s.value}
                     </span>
-                    <span className="text-sm font-semibold text-muted-foreground">{s.unit}</span>
+                    <span className="text-xs sm:text-sm font-semibold text-muted-foreground">{s.unit}</span>
                   </div>
                 </div>
                 <div
                   className={cn(
-                    "rounded-xl p-2.5 transition-transform group-hover:scale-105",
+                    "rounded-xl p-2.5 shrink-0 transition-transform group-hover:scale-105",
                     s.accentColor,
                   )}
                 >
@@ -266,41 +283,119 @@ export function DashboardTab() {
         })}
       </div>
 
-      {/* Chart + Devices */}
-      <div className="flex-1 min-h-0 grid gap-3 lg:grid-cols-12 overflow-hidden">
-        {/* Left Column: Chart */}
-        <div className="flex flex-col rounded-2xl border border-border/80 bg-card p-3.5 shadow-xs lg:col-span-7 xl:col-span-8 h-full overflow-hidden">
+      {/* Middle Section: Biểu đồ riêng cảm biến mới bên trái + Biểu đồ cũ bên phải */}
+      <div className="flex-1 min-h-0 grid gap-2.5 lg:grid-cols-12 overflow-hidden">
+        {/* Left Column: Biểu đồ riêng cho cảm biến mới (Khí Gas MQ-2) */}
+        <div className="flex flex-col rounded-2xl border border-border/80 bg-card p-3 shadow-xs lg:col-span-5 xl:col-span-5 h-full overflow-hidden">
+          <div className="flex items-center justify-between border-b border-border/60 pb-2 shrink-0">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <Flame className="h-4 w-4 text-violet-500" />
+                <h2 className="font-display text-xs font-bold text-foreground">
+                  Biểu đồ Khí Gas (MQ-2)
+                </h2>
+              </div>
+              <p className="text-[11px] text-muted-foreground pt-0.5 font-medium truncate">
+                Mức đo: {sensors?.gas != null ? `${sensors.gas.toFixed(1)} ppm` : "--"} · Cảnh báo: &gt; 400 ppm
+              </p>
+            </div>
+            <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-bold text-violet-600 dark:text-violet-400">
+              Cảm biến riêng
+            </span>
+          </div>
+
+          <div className="flex-1 min-h-0 mt-2">
+            {!sensors?.hasData || preparedChartData.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center text-xs text-muted-foreground">
+                <Flame className="h-7 w-7 text-muted-foreground/30 mb-1" />
+                <p className="font-semibold text-foreground">Chưa có dữ liệu khí Gas</p>
+                <p className="mt-0.5 text-[11px]">Đang chờ dữ liệu thời gian thực từ ESP32...</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={preparedChartData}
+                  margin={{ top: 8, right: 10, left: -20, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="gasGradientMain" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                  <XAxis
+                    dataKey="time"
+                    stroke="var(--muted-foreground)"
+                    fontSize={10}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    stroke="var(--muted-foreground)"
+                    fontSize={10}
+                    tickLine={false}
+                    domain={[0, "auto"]}
+                    unit=" ppm"
+                  />
+                  <Tooltip
+                    formatter={(val: number) => [`${val} ppm`, "Nồng độ Khí Gas"]}
+                    contentStyle={{
+                      backgroundColor: "var(--popover)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "0.75rem",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="gas"
+                    name="Khí Gas (ppm)"
+                    stroke="#8b5cf6"
+                    strokeWidth={2.5}
+                    fillOpacity={1}
+                    fill="url(#gasGradientMain)"
+                    dot={{ r: 2.5, fill: "#8b5cf6" }}
+                    activeDot={{ r: 5 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Biểu đồ cũ (Nhiệt độ, Độ ẩm, Ánh sáng) */}
+        <div className="flex flex-col rounded-2xl border border-border/80 bg-card p-3 shadow-xs lg:col-span-7 xl:col-span-7 h-full overflow-hidden">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-2 shrink-0">
             <div>
-              <h2 className="font-display text-sm font-bold text-foreground">
-                {selectedChart === "ALL" && "Biểu đồ tổng hợp các cảm biến (ALL)"}
+              <h2 className="font-display text-xs font-bold text-foreground">
+                {selectedChart === "ALL" && "Biểu đồ tổng hợp các cảm biến"}
                 {selectedChart === "TEMPERATURE" && "Biểu đồ Nhiệt độ (°C) — DHT11"}
                 {selectedChart === "HUMIDITY" && "Biểu đồ Độ ẩm (%) — DHT11"}
                 {selectedChart === "LIGHT" && "Biểu đồ Ánh sáng (Lux) — BH1750"}
               </h2>
               {selectedChart === "ALL" ? (
-                <div className="flex flex-wrap items-center gap-2.5 text-[11px] pt-0.5">
+                <div className="flex flex-wrap items-center gap-2 text-[10px] pt-0.5">
                   <span className="inline-flex items-center gap-1 font-medium text-foreground">
                     <span className="h-2 w-2 rounded-full bg-rose-500" />
-                    Nhiệt độ (°C)
+                    Nhiệt độ
                   </span>
                   <span className="inline-flex items-center gap-1 font-medium text-foreground">
                     <span className="h-2 w-2 rounded-full bg-sky-500" />
-                    Độ ẩm (%)
+                    Độ ẩm
                   </span>
                   <span className="inline-flex items-center gap-1 font-medium text-foreground">
                     <span className="h-2 w-2 rounded-full bg-amber-500" />
-                    Ánh sáng (Lux/10)
+                    Ánh sáng
                   </span>
                 </div>
               ) : (
-                <p className="text-[11px] text-muted-foreground pt-0.5 font-medium">
+                <p className="text-[11px] text-muted-foreground pt-0.5 font-medium truncate">
                   {selectedChart === "TEMPERATURE" &&
-                    `Mức đo hiện tại: ${sensors?.temperature != null ? `${sensors.temperature.toFixed(1)} °C` : "--"} • Ngưỡng an toàn: 18°C - 28°C`}
+                    `Mức đo: ${sensors?.temperature != null ? `${sensors.temperature.toFixed(1)} °C` : "--"} • Ngưỡng: 18°C - 28°C`}
                   {selectedChart === "HUMIDITY" &&
-                    `Mức đo hiện tại: ${sensors?.humidity != null ? `${sensors.humidity.toFixed(1)} %` : "--"} • Ngưỡng cảnh báo: > 70%`}
+                    `Mức đo: ${sensors?.humidity != null ? `${sensors.humidity.toFixed(1)} %` : "--"} • Ngưỡng: > 70%`}
                   {selectedChart === "LIGHT" &&
-                    `Mức đo hiện tại: ${sensors?.light != null ? `${Math.round(sensors.light)} Lux` : "--"} • Ngưỡng tối: < 100 Lux`}
+                    `Mức đo: ${sensors?.light != null ? `${Math.round(sensors.light)} Lux` : "--"} • Ngưỡng: < 100 Lux`}
                 </p>
               )}
             </div>
@@ -310,7 +405,7 @@ export function DashboardTab() {
                 type="button"
                 onClick={() => setSelectedChart("ALL")}
                 className={cn(
-                  "px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer",
+                  "px-2 py-0.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer",
                   selectedChart === "ALL"
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground",
@@ -322,7 +417,7 @@ export function DashboardTab() {
                 type="button"
                 onClick={() => setSelectedChart("TEMPERATURE")}
                 className={cn(
-                  "px-2.5 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer",
+                  "px-2 py-0.5 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer",
                   selectedChart === "TEMPERATURE"
                     ? "bg-rose-500 text-white shadow-xs"
                     : "text-muted-foreground hover:text-rose-500",
@@ -335,7 +430,7 @@ export function DashboardTab() {
                 type="button"
                 onClick={() => setSelectedChart("HUMIDITY")}
                 className={cn(
-                  "px-2.5 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer",
+                  "px-2 py-0.5 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer",
                   selectedChart === "HUMIDITY"
                     ? "bg-sky-500 text-white shadow-xs"
                     : "text-muted-foreground hover:text-sky-500",
@@ -348,7 +443,7 @@ export function DashboardTab() {
                 type="button"
                 onClick={() => setSelectedChart("LIGHT")}
                 className={cn(
-                  "px-2.5 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer",
+                  "px-2 py-0.5 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer",
                   selectedChart === "LIGHT"
                     ? "bg-amber-500 text-white shadow-xs"
                     : "text-muted-foreground hover:text-amber-500",
@@ -375,7 +470,7 @@ export function DashboardTab() {
               </div>
             ) : (
               <>
-                {chartWidth > 0 && selectedChart === "ALL" && (
+                {selectedChart === "ALL" && (
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={preparedChartData}
@@ -385,12 +480,12 @@ export function DashboardTab() {
                       <XAxis
                         dataKey="time"
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
                       />
                       <YAxis
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
                         domain={[0, "auto"]}
                       />
@@ -407,33 +502,33 @@ export function DashboardTab() {
                         dataKey="temp"
                         name="Nhiệt độ (°C)"
                         stroke="var(--chart-1)"
-                        strokeWidth={2.5}
-                        dot={{ r: 2.5, fill: "var(--chart-1)" }}
-                        activeDot={{ r: 5 }}
+                        strokeWidth={2}
+                        dot={{ r: 2, fill: "var(--chart-1)" }}
+                        activeDot={{ r: 4 }}
                       />
                       <Line
                         type="monotone"
                         dataKey="hum"
                         name="Độ ẩm (%)"
                         stroke="var(--chart-2)"
-                        strokeWidth={2.5}
-                        dot={{ r: 2.5, fill: "var(--chart-2)" }}
-                        activeDot={{ r: 5 }}
+                        strokeWidth={2}
+                        dot={{ r: 2, fill: "var(--chart-2)" }}
+                        activeDot={{ r: 4 }}
                       />
                       <Line
                         type="monotone"
                         dataKey="luxScaled"
                         name="Ánh sáng (Lux/10)"
                         stroke="var(--chart-3)"
-                        strokeWidth={2.5}
-                        dot={{ r: 2.5, fill: "var(--chart-3)" }}
-                        activeDot={{ r: 5 }}
+                        strokeWidth={2}
+                        dot={{ r: 2, fill: "var(--chart-3)" }}
+                        activeDot={{ r: 4 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 )}
 
-                {chartWidth > 0 && selectedChart === "TEMPERATURE" && (
+                {selectedChart === "TEMPERATURE" && (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={preparedChartData}
@@ -449,15 +544,15 @@ export function DashboardTab() {
                       <XAxis
                         dataKey="time"
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
                       />
                       <YAxis
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
-                        domain={["auto", "auto"]}
-                        unit="°"
+                        domain={[0, "auto"]}
+                        unit="°C"
                       />
                       <Tooltip
                         formatter={(val: number) => [`${val} °C`, "Nhiệt độ"]}
@@ -476,14 +571,14 @@ export function DashboardTab() {
                         strokeWidth={2.5}
                         fillOpacity={1}
                         fill="url(#tempGradientMain)"
-                        dot={{ r: 3, fill: "#ef4444" }}
-                        activeDot={{ r: 6 }}
+                        dot={{ r: 2.5, fill: "#ef4444" }}
+                        activeDot={{ r: 5 }}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
                 )}
 
-                {chartWidth > 0 && selectedChart === "HUMIDITY" && (
+                {selectedChart === "HUMIDITY" && (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={preparedChartData}
@@ -499,12 +594,12 @@ export function DashboardTab() {
                       <XAxis
                         dataKey="time"
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
                       />
                       <YAxis
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
                         domain={[0, 100]}
                         unit="%"
@@ -526,14 +621,14 @@ export function DashboardTab() {
                         strokeWidth={2.5}
                         fillOpacity={1}
                         fill="url(#humGradientMain)"
-                        dot={{ r: 3, fill: "#0ea5e9" }}
-                        activeDot={{ r: 6 }}
+                        dot={{ r: 2.5, fill: "#0ea5e9" }}
+                        activeDot={{ r: 5 }}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
                 )}
 
-                {chartWidth > 0 && selectedChart === "LIGHT" && (
+                {selectedChart === "LIGHT" && (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={preparedChartData}
@@ -549,12 +644,12 @@ export function DashboardTab() {
                       <XAxis
                         dataKey="time"
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
                       />
                       <YAxis
                         stroke="var(--muted-foreground)"
-                        fontSize={11}
+                        fontSize={10}
                         tickLine={false}
                         domain={[0, "auto"]}
                       />
@@ -575,8 +670,8 @@ export function DashboardTab() {
                         strokeWidth={2.5}
                         fillOpacity={1}
                         fill="url(#luxGradientMain)"
-                        dot={{ r: 3, fill: "#f59e0b" }}
-                        activeDot={{ r: 6 }}
+                        dot={{ r: 2.5, fill: "#f59e0b" }}
+                        activeDot={{ r: 5 }}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -585,129 +680,140 @@ export function DashboardTab() {
             )}
           </div>
         </div>
+      </div>
 
-        {/* Right Column: Device Control */}
-        <div className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-3.5 shadow-xs lg:col-span-5 xl:col-span-4 h-full overflow-hidden">
-          <div>
-            <div className="flex items-center justify-between border-b border-border/60 pb-2">
-              <h2 className="font-display text-sm font-bold text-foreground">
-                Điều khiển thiết bị
-              </h2>
+      {/* Bottom Section: Các nút bật tắt để hàng ngang bên dưới */}
+      <div className="shrink-0 rounded-2xl border border-border/80 bg-card p-3 shadow-xs">
+        <div className="flex items-center justify-between border-b border-border/60 pb-1.5 mb-2">
+          <div className="flex items-center gap-2">
+            <Zap className="h-4 w-4 text-primary" />
+            <h2 className="font-display text-xs font-bold uppercase tracking-wider text-foreground">
+              Bảng điều khiển thiết bị
+            </h2>
+          </div>
+          {controlFeedback && (
+            <span className="text-[11px] font-medium text-primary truncate max-w-md">
+              {controlFeedback}
+            </span>
+          )}
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground font-medium">
+              <span className="font-bold text-foreground">
+                {deviceList.filter((d) => d.on).length}/{deviceList.length}
+              </span>{" "}
+              đang BẬT
+            </span>
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 text-[11px] font-semibold",
+                connectivity.mqttConnected ? "text-primary" : "text-muted-foreground",
+              )}
+            >
               <span
                 className={cn(
-                  "inline-flex items-center gap-1 text-xs font-semibold",
-                  connectivity.mqttConnected ? "text-primary" : "text-muted-foreground",
+                  "h-1.5 w-1.5 rounded-full",
+                  connectivity.mqttConnected ? "bg-primary animate-pulse" : "bg-muted-foreground",
+                )}
+              />
+              {connectivity.mqttConnected ? "MQTT Trực tiếp" : "MQTT Offline"}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+          {deviceList.map((d) => {
+            const isLoading = loadingDevice === d.id;
+            return (
+              <div
+                key={d.id}
+                className={cn(
+                  "rounded-xl border p-2.5 transition-all duration-200",
+                  d.on
+                    ? "border-primary/30 bg-primary/[0.03]"
+                    : "border-border/60 bg-secondary/20",
                 )}
               >
-                <Zap className="h-3.5 w-3.5" />
-                {connectivity.mqttConnected ? "MQTT Trực tiếp" : "MQTT Offline"}
-              </span>
-            </div>
-
-            <div className="mt-2.5 flex flex-col gap-2">
-              {deviceList.map((d) => {
-                const isLoading = loadingDevice === d.id;
-                return (
-                  <div
-                    key={d.id}
-                    className={cn(
-                      "rounded-xl border p-2.5 transition-all duration-200",
-                      d.on
-                        ? "border-primary/30 bg-primary/[0.03]"
-                        : "border-border/60 bg-secondary/20",
-                    )}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2.5">
-                        <div
+                <div className="flex items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div
+                      className={cn(
+                        "grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-all",
+                        d.on
+                          ? "bg-primary text-primary-foreground shadow-xs"
+                          : "bg-secondary text-muted-foreground",
+                      )}
+                    >
+                      {d.type === "FAN" && (
+                        <Fan className={cn("h-4 w-4", d.on && "animate-spin")} />
+                      )}
+                      {d.type === "LIGHT" && d.id !== "led4" && (
+                        <Lightbulb
+                          className={cn("h-4 w-4", d.on && "fill-amber-300 text-amber-300")}
+                        />
+                      )}
+                      {d.id === "led4" && (
+                        <Bell
                           className={cn(
-                            "grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-all",
-                            d.on
-                              ? "bg-primary text-primary-foreground shadow-xs"
-                              : "bg-secondary text-muted-foreground",
-                          )}
-                        >
-                          {d.type === "FAN" && (
-                            <Fan className={cn("h-4 w-4", d.on && "animate-spin")} />
-                          )}
-                          {d.type === "LIGHT" && (
-                            <Lightbulb
-                              className={cn("h-4 w-4", d.on && "fill-amber-300 text-amber-300")}
-                            />
-                          )}
-                          {d.type === "AC" && (
-                            <AirVent className={cn("h-4 w-4", d.on && "animate-pulse")} />
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-xs font-bold text-foreground">{d.name}</p>
-                            <span className="text-[10px] font-mono text-muted-foreground">
-                              ({d.id})
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 text-[11px]">
-                            <span
-                              className={cn(
-                                "font-bold",
-                                isLoading
-                                  ? "text-amber-500"
-                                  : d.on
-                                    ? "text-success"
-                                    : "text-muted-foreground",
-                              )}
-                            >
-                              {isLoading ? "Đang chờ ACK..." : d.on ? "BẬT" : "TẮT"}
-                            </span>
-                            <span className="text-muted-foreground">· {d.subtitle}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={d.on}
-                        disabled={isLoading}
-                        onClick={() => handleToggleDevice(d)}
-                        className={cn(
-                          "relative h-5.5 w-10 shrink-0 rounded-full transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer",
-                          isLoading
-                            ? "bg-amber-400 opacity-80"
-                            : d.on
-                              ? "bg-success"
-                              : "bg-muted-foreground/30",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "absolute top-0.5 h-4.5 w-4.5 rounded-full bg-background shadow-xs transition-all duration-200 ease-out",
-                            d.on ? "left-5" : "left-0.5",
+                            "h-4 w-4",
+                            d.on ? "fill-rose-400 text-rose-500 animate-pulse" : "text-muted-foreground",
                           )}
                         />
-                      </button>
+                      )}
+                      {d.type === "AC" && (
+                        <AirVent className={cn("h-4 w-4", d.on && "animate-pulse")} />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1">
+                        <p className="text-xs font-bold text-foreground truncate">{d.name}</p>
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          ({d.id})
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px]">
+                        <span
+                          className={cn(
+                            "font-bold",
+                            isLoading
+                              ? "text-amber-500"
+                              : d.on
+                                ? "text-success"
+                                : "text-muted-foreground",
+                          )}
+                        >
+                          {isLoading ? "Chờ ACK..." : d.on ? "BẬT" : "TẮT"}
+                        </span>
+                        <span className="text-muted-foreground truncate">· {d.subtitle}</span>
+                      </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
 
-            {controlFeedback && (
-              <p className="mt-2 rounded-lg bg-secondary/70 px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground">
-                {controlFeedback}
-              </p>
-            )}
-          </div>
-
-          <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">
-              Tổng số: {deviceList.length} thiết bị
-            </span>
-            <span className="inline-flex items-center gap-1.5 font-semibold text-success">
-              <span className="h-2 w-2 rounded-full bg-success" />
-              {deviceList.filter((d) => d.on).length} đang BẬT
-            </span>
-          </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={d.on}
+                    disabled={isLoading}
+                    onClick={() => handleToggleDevice(d)}
+                    className={cn(
+                      "relative h-5.5 w-10 shrink-0 rounded-full transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer",
+                      isLoading
+                        ? "bg-amber-400 opacity-80"
+                        : d.on
+                          ? "bg-success"
+                          : "bg-muted-foreground/30",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "absolute top-0.5 h-4.5 w-4.5 rounded-full bg-background shadow-xs transition-all duration-200 ease-out",
+                        d.on ? "left-5" : "left-0.5",
+                      )}
+                    />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

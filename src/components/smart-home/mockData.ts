@@ -109,18 +109,30 @@ export const initialProfile: UserProfileData = {
 };
 
 export const initialChartData = [
-  { time: "08:00:00", temp: 20.2, hum: 78, lux: 450 },
-  { time: "09:00:00", temp: 21.0, hum: 76, lux: 620 },
-  { time: "10:00:00", temp: 22.4, hum: 74, lux: 850 },
-  { time: "11:00:00", temp: 24.1, hum: 71, lux: 980 },
-  { time: "12:00:00", temp: 26.5, hum: 68, lux: 1120 },
-  { time: "13:00:00", temp: 27.8, hum: 65, lux: 1050 },
-  { time: "14:00:00", temp: 28.5, hum: 69, lux: 1000 },
-  { time: "15:00:00", temp: 26.2, hum: 75, lux: 920 },
-  { time: "16:00:00", temp: 23.8, hum: 80, lux: 740 },
+  { time: "08:00:00", temp: 20.2, hum: 78, lux: 450, gas: 260 },
+  { time: "09:00:00", temp: 21.0, hum: 76, lux: 620, gas: 280 },
+  { time: "10:00:00", temp: 22.4, hum: 74, lux: 850, gas: 310 },
+  { time: "11:00:00", temp: 24.1, hum: 71, lux: 980, gas: 340 },
+  { time: "12:00:00", temp: 26.5, hum: 68, lux: 1120, gas: 390 },
+  { time: "13:00:00", temp: 27.8, hum: 65, lux: 1050, gas: 420 },
+  { time: "14:00:00", temp: 28.5, hum: 69, lux: 1000, gas: 380 },
+  { time: "15:00:00", temp: 26.2, hum: 75, lux: 920, gas: 330 },
+  { time: "16:00:00", temp: 23.8, hum: 80, lux: 740, gas: 290 },
 ];
 
 export const initialSensorRecords: SensorDataRecord[] = [
+  {
+    id: "#DS-000",
+    sensorName: "MQ-2 (Khí Gas)",
+    sensorType: "GAS",
+    room: "Phòng 1 (Phòng Khách)",
+    value: 320.5,
+    unit: "ppm",
+    timestamp: "2026-08-27 09:15:30",
+    status: "NORMAL",
+    topic: "ssdata",
+    rawPayload: { tem: 20.5, humid: 80, lux: 1000, gas: 320.5 },
+  },
   {
     id: "#DS-001",
     sensorName: "DHT11 (Nhiệt độ)",

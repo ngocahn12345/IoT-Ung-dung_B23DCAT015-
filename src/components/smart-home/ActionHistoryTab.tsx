@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   AirVent,
   ArrowUpDown,
+  Bell,
   ChevronDown,
   Fan,
   Lightbulb,
@@ -160,7 +161,7 @@ export function ActionHistoryTab() {
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Tìm kiếm thiết bị, thời gian..."
+              placeholder="Tìm kiếm thiết bị (quạt, đèn, điều hòa, cảnh báo...), hành động, thời gian..."
               value={searchTermInput}
               onChange={(e) => {
                 setSearchTermInput(e.target.value);
@@ -314,8 +315,11 @@ export function ActionHistoryTab() {
                       <div className="flex items-center gap-2.5">
                         <div className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-secondary text-foreground">
                           {r.deviceType === "FAN" && <Fan className="h-3.5 w-3.5" />}
-                          {r.deviceType === "LIGHT" && (
+                          {r.deviceType === "LIGHT" && !r.deviceId.includes("4") && (
                             <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+                          )}
+                          {(r.deviceId === "led4" || r.deviceType === "ALARM" || r.deviceName.includes("cảnh báo") || (r.deviceType === "LIGHT" && r.deviceId.includes("4"))) && (
+                            <Bell className="h-3.5 w-3.5 text-rose-500 animate-pulse" />
                           )}
                           {r.deviceType === "AC" && (
                             <AirVent className="h-3.5 w-3.5 text-sky-500" />
