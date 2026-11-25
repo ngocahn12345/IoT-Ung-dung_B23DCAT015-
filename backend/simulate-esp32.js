@@ -32,7 +32,7 @@ client.on('connect', () => {
     const temp = +(26 + Math.random() * 5).toFixed(1);   // 26 - 31 °C
     const humid = +(60 + Math.random() * 20).toFixed(1); // 60 - 80 %
     const lux = Math.floor(300 + Math.random() * 500);   // 300 - 800 Lux
-    const gas = +(200 + Math.random() * 320).toFixed(1); // 200 - 520 ppm (cảm biến ngẫu nhiên MQ-2)
+    const gas = +(1 + Math.random() * 999).toFixed(1); // 1 - 1000 ppm (cảm biến ngẫu nhiên MQ-2)
 
     const payload = JSON.stringify({
       tem: temp,

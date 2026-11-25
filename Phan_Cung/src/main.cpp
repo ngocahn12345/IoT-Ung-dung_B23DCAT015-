@@ -1,21 +1,21 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <Wire.h>
 #include <BH1750.h>
 #include <DHT.h>
 #include <PubSubClient.h>
+#include <WiFi.h>
+#include <Wire.h>
 
 // Thông tin kết nối mạng WiFi & MQTT Broker
-const char* ssid = "Blue House";
-const char* password = "Chaomungban222";
-const char* mqtt_server = "broker.hivemq.com";
+const char *ssid = "khanhhh";
+const char *password = "khanh143";
+const char *mqtt_server = "broker.hivemq.com";
 
 // Định nghĩa các MQTT Topics
-const char* topic_sensor = "ssdata";
-const char* topic_control = "dvcontrol";
-const char* topic_respond = "dvrespond";
+const char *topic_sensor = "ssdata";
+const char *topic_control = "dvcontrol";
+const char *topic_respond = "dvrespond";
 
-// Cấu hình chân GPIO 
+// Cấu hình chân GPIO
 #define SDA_PIN 8
 #define SCL_PIN 9
 #define DHT_PIN 1
@@ -42,17 +42,16 @@ unsigned long lastBh1750Retry = 0;
 
 void connectWiFi();
 void reconnectMQTT();
-void callback(char* topic, byte* payload, unsigned int length);
+void callback(char *topic, byte *payload, unsigned int length);
 void publishDeviceRespond();
 void controlAutomaticLeds(float temp, float humid, float lux, float gas);
 bool initializeBH1750();
 void scanI2C();
-bool jsonBool(const String& message, const char* key, bool& value);
-bool jsonAuto(const String& message, const char* key);
+bool jsonBool(const String &message, const char *key, bool &value);
+bool jsonAuto(const String &message, const char *key);
 
 // Luồng khởi động
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   delay(1500);
   Serial.println();
@@ -86,8 +85,7 @@ void setup()
 }
 
 // Vòng lặp chính
-void loop()
-{
+void loop() {
   if (WiFi.status() != WL_CONNECTED) {
     connectWiFi();
   }
@@ -95,7 +93,7 @@ void loop()
     reconnectMQTT();
   }
 
-  // Lắng nghe gói tin đến từ MQTT 
+  // Lắng nghe gói tin đến từ MQTT
   client.loop();
 
   // Đọc cảm biến
@@ -113,16 +111,18 @@ void loop()
 
     float lux = bh1750Ready ? lightMeter.readLightLevel() : -2.0;
 
-    // Sinh giá trị cảm biến ngẫu nhiên (Ví dụ: Khí Gas / Khói MQ-2, đơn vị: ppm)
-    float gas = random(200, 520) + (random(0, 100) / 100.0);
+    // Sinh giá trị cảm biến ngẫu nhiên từ 1 đến 1000 (ppm)
+    float gas = random(1, 1001) + (random(0, 100) / 100.0);
 
-    Serial.printf("[Sensor] Temp: %.1f *C | Hum: %.1f %% | Lux: %.1f lx | Gas: %.1f ppm\n", temp, humid, lux, gas);
+    Serial.printf("[Sensor] Temp: %.1f *C | Hum: %.1f %% | Lux: %.1f lx | Gas: "
+                  "%.1f ppm\n",
+                  temp, humid, lux, gas);
 
     if (!isnan(temp) && !isnan(humid)) {
       char buffer[192];
       snprintf(buffer, sizeof(buffer),
-               "{\"tem\":%.2f,\"humid\":%.2f,\"lux\":%.2f,\"gas\":%.2f}",
-               temp, humid, lux, gas);
+               "{\"tem\":%.2f,\"humid\":%.2f,\"lux\":%.2f,\"gas\":%.2f}", temp,
+               humid, lux, gas);
       if (client.publish(topic_sensor, buffer)) {
         Serial.println(buffer);
       } else {
@@ -135,13 +135,13 @@ void loop()
   }
 }
 
-void reconnectMQTT()
-{
+void reconnectMQTT() {
   int attempts = 0;
   while (!client.connected() && WiFi.status() == WL_CONNECTED && attempts < 3) {
     attempts++;
     Serial.print("Connecting to MQTT...");
-    String clientId = "ESP32_Bai2_B23DCAT015" + String((uint32_t)ESP.getEfuseMac(), HEX);
+    String clientId =
+        "ESP32_Bai2_B23DCAT015" + String((uint32_t)ESP.getEfuseMac(), HEX);
 
     if (client.connect(clientId.c_str())) {
       Serial.println(" CONNECTED!");
@@ -162,23 +162,34 @@ void reconnectMQTT()
   }
 }
 
-void callback(char* topic, byte* payload, unsigned int length)
-{
+void callback(char *topic, byte *payload, unsigned int length) {
   String message;
   for (unsigned int index = 0; index < length; index++) {
     message += static_cast<char>(payload[index]);
   }
 
   bool value;
-  if (jsonBool(message, "led1_auto", value) || jsonBool(message, "LED1_AUTO", value)) led1Auto = value;
-  if (jsonBool(message, "led2_auto", value) || jsonBool(message, "LED2_AUTO", value)) led2Auto = value;
-  if (jsonBool(message, "led3_auto", value) || jsonBool(message, "LED3_AUTO", value)) led3Auto = value;
-  if (jsonBool(message, "led4_auto", value) || jsonBool(message, "LED4_AUTO", value)) led4Auto = value;
+  if (jsonBool(message, "led1_auto", value) ||
+      jsonBool(message, "LED1_AUTO", value))
+    led1Auto = value;
+  if (jsonBool(message, "led2_auto", value) ||
+      jsonBool(message, "LED2_AUTO", value))
+    led2Auto = value;
+  if (jsonBool(message, "led3_auto", value) ||
+      jsonBool(message, "LED3_AUTO", value))
+    led3Auto = value;
+  if (jsonBool(message, "led4_auto", value) ||
+      jsonBool(message, "LED4_AUTO", value))
+    led4Auto = value;
 
-  if (jsonAuto(message, "LED1") || jsonAuto(message, "led1")) led1Auto = true;
-  if (jsonAuto(message, "LED2") || jsonAuto(message, "led2")) led2Auto = true;
-  if (jsonAuto(message, "LED3") || jsonAuto(message, "led3")) led3Auto = true;
-  if (jsonAuto(message, "LED4") || jsonAuto(message, "led4")) led4Auto = true;
+  if (jsonAuto(message, "LED1") || jsonAuto(message, "led1"))
+    led1Auto = true;
+  if (jsonAuto(message, "LED2") || jsonAuto(message, "led2"))
+    led2Auto = true;
+  if (jsonAuto(message, "LED3") || jsonAuto(message, "led3"))
+    led3Auto = true;
+  if (jsonAuto(message, "LED4") || jsonAuto(message, "led4"))
+    led4Auto = true;
 
   if (!jsonAuto(message, "LED1") && !jsonAuto(message, "led1") &&
       (jsonBool(message, "led1", value) || jsonBool(message, "LED1", value))) {
@@ -209,20 +220,18 @@ void callback(char* topic, byte* payload, unsigned int length)
   publishDeviceRespond();
 }
 
-void publishDeviceRespond()
-{
+void publishDeviceRespond() {
   char buffer[256];
-  snprintf(buffer, sizeof(buffer), "{\"LED1\":\"%s\",\"LED2\":\"%s\",\"LED3\":\"%s\",\"LED4\":\"%s\"}",
-           digitalRead(LED_1) ? "ON" : "OFF",
-           digitalRead(LED_2) ? "ON" : "OFF",
+  snprintf(buffer, sizeof(buffer),
+           "{\"LED1\":\"%s\",\"LED2\":\"%s\",\"LED3\":\"%s\",\"LED4\":\"%s\"}",
+           digitalRead(LED_1) ? "ON" : "OFF", digitalRead(LED_2) ? "ON" : "OFF",
            digitalRead(LED_3) ? "ON" : "OFF",
            digitalRead(LED_4) ? "ON" : "OFF");
 
   client.publish(topic_respond, buffer, true);
 }
 
-void connectWiFi()
-{
+void connectWiFi() {
   Serial.print("Connecting to WiFi: ");
   Serial.println(ssid);
 
@@ -249,8 +258,7 @@ void connectWiFi()
   Serial.println("WiFi status: CONNECTED");
 }
 
-void controlAutomaticLeds(float temp, float humid, float lux, float gas)
-{
+void controlAutomaticLeds(float temp, float humid, float lux, float gas) {
   bool changed = false;
 
   // LED 1: Nhiệt độ > 35°C thì bật
@@ -295,8 +303,7 @@ void controlAutomaticLeds(float temp, float humid, float lux, float gas)
 }
 
 // Khởi tạo BH1750 qua I2C
-bool initializeBH1750()
-{
+bool initializeBH1750() {
   bool ready = lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE, 0x23);
   if (!ready) {
     ready = lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE, 0x5C);
@@ -310,8 +317,7 @@ bool initializeBH1750()
   return ready;
 }
 
-void scanI2C()
-{
+void scanI2C() {
   Serial.println("I2C scan:");
   bool found = false;
 
@@ -329,8 +335,7 @@ void scanI2C()
   }
 }
 
-bool jsonBool(const String& message, const char* key, bool& value)
-{
+bool jsonBool(const String &message, const char *key, bool &value) {
   String trueValue = String("\"") + key + "\":true";
   String falseValue = String("\"") + key + "\":false";
   String onValue = String("\"") + key + "\":\"ON\"";
@@ -347,8 +352,7 @@ bool jsonBool(const String& message, const char* key, bool& value)
   return false;
 }
 
-bool jsonAuto(const String& message, const char* key)
-{
+bool jsonAuto(const String &message, const char *key) {
   String autoValue = String("\"") + key + "\":\"AUTO\"";
   return message.indexOf(autoValue) >= 0;
 }
