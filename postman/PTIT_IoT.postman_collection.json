@@ -104,342 +104,6 @@
       "name": "Điều khiển",
       "item": [
         {
-          "name": "Bật đèn (LED 3)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Gửi lệnh ON cho Bật đèn (LED 3) thành công (200)\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const json = pm.response.json();",
-                  "pm.test(\"Phản hồi success: true\", function () {",
-                  "    pm.expect(json.success).to.be.true;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{api_key}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "device",
-                  "value": "{{den}}",
-                  "type": "text"
-                },
-                {
-                  "key": "action",
-                  "value": "ON",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/control",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "control"
-              ]
-            },
-            "description": "Bật đèn chiếu sáng (LED 3 trên chân GPIO 7)"
-          }
-        },
-        {
-          "name": "Tắt đèn (LED 3)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Gửi lệnh OFF cho Tắt đèn (LED 3) thành công (200)\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const json = pm.response.json();",
-                  "pm.test(\"Phản hồi success: true\", function () {",
-                  "    pm.expect(json.success).to.be.true;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{api_key}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "device",
-                  "value": "{{den}}",
-                  "type": "text"
-                },
-                {
-                  "key": "action",
-                  "value": "OFF",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/control",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "control"
-              ]
-            },
-            "description": "Tắt đèn chiếu sáng (LED 3 trên chân GPIO 7)"
-          }
-        },
-        {
-          "name": "Bật quạt (LED 2)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Gửi lệnh ON cho Bật quạt (LED 2) thành công (200)\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const json = pm.response.json();",
-                  "pm.test(\"Phản hồi success: true\", function () {",
-                  "    pm.expect(json.success).to.be.true;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{api_key}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "device",
-                  "value": "{{quat}}",
-                  "type": "text"
-                },
-                {
-                  "key": "action",
-                  "value": "ON",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/control",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "control"
-              ]
-            },
-            "description": "Bật quạt thông gió (LED 2 trên chân GPIO 6)"
-          }
-        },
-        {
-          "name": "Tắt quạt (LED 2)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Gửi lệnh OFF cho Tắt quạt (LED 2) thành công (200)\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const json = pm.response.json();",
-                  "pm.test(\"Phản hồi success: true\", function () {",
-                  "    pm.expect(json.success).to.be.true;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{api_key}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "device",
-                  "value": "{{quat}}",
-                  "type": "text"
-                },
-                {
-                  "key": "action",
-                  "value": "OFF",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/control",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "control"
-              ]
-            },
-            "description": "Tắt quạt thông gió (LED 2 trên chân GPIO 6)"
-          }
-        },
-        {
-          "name": "Bật điều hòa (LED 1)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Gửi lệnh ON cho Bật điều hòa (LED 1) thành công (200)\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const json = pm.response.json();",
-                  "pm.test(\"Phản hồi success: true\", function () {",
-                  "    pm.expect(json.success).to.be.true;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{api_key}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "device",
-                  "value": "{{dieuhoa}}",
-                  "type": "text"
-                },
-                {
-                  "key": "action",
-                  "value": "ON",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/control",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "control"
-              ]
-            },
-            "description": "Bật điều hòa không khí (LED 1 trên chân GPIO 5)"
-          }
-        },
-        {
-          "name": "Tắt điều hòa (LED 1)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Gửi lệnh OFF cho Tắt điều hòa (LED 1) thành công (200)\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const json = pm.response.json();",
-                  "pm.test(\"Phản hồi success: true\", function () {",
-                  "    pm.expect(json.success).to.be.true;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{api_key}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "device",
-                  "value": "{{dieuhoa}}",
-                  "type": "text"
-                },
-                {
-                  "key": "action",
-                  "value": "OFF",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/control",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "control"
-              ]
-            },
-            "description": "Tắt điều hòa không khí (LED 1 trên chân GPIO 5)"
-          }
-        },
-        {
           "name": "Bật tất cả LED",
           "event": [
             {
@@ -487,7 +151,7 @@
                 "all"
               ]
             },
-            "description": "Gửi lệnh BẬT đồng loạt cả 4 đèn LED (LED 1 -> LED 4) xuống ESP32"
+            "description": "Bật đồng loạt cả 4 đèn LED (LED 1 -> LED 4)"
           }
         },
         {
@@ -538,17 +202,17 @@
                 "all"
               ]
             },
-            "description": "Gửi lệnh TẮT đồng loạt cả 4 đèn LED (LED 1 -> LED 4) xuống ESP32"
+            "description": "Tắt đồng loạt cả 4 đèn LED (LED 1 -> LED 4)"
           }
         },
         {
-          "name": "Bật LED theo danh sách ID (Batch)",
+          "name": "Bật LED 1 theo ID (ID 1 - GPIO 5)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Điều khiển theo danh sách ID thành công (200)\", function () {",
+                  "pm.test(\"Bật LED 1 theo ID (ID 1 - GPIO 5) thành công (200)\", function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "const json = pm.response.json();",
@@ -576,31 +240,284 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ids\": [2, 4],\n  \"action\": \"ON\"\n}"
+              "raw": "{\n  \"id\": 1,\n  \"action\": \"ON\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/control/batch",
+              "raw": "{{base_url}}/api/control",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "control",
-                "batch"
+                "control"
               ]
             },
-            "description": "Điều khiển đồng thời nhiều LED theo mảng ID (ví dụ: LED 2 và LED 4)"
+            "description": "Bật đèn LED 1 theo ID thiết bị 1"
           }
         },
         {
-          "name": "Bật LED theo ID (LED 4 - ID 4)",
+          "name": "Tắt LED 1 theo ID (ID 1 - GPIO 5)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Điều khiển LED theo ID thành công (200)\", function () {",
+                  "pm.test(\"Tắt LED 1 theo ID (ID 1 - GPIO 5) thành công (200)\", function () {",
                   "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"action\": \"OFF\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Tắt đèn LED 1 theo ID thiết bị 1"
+          }
+        },
+        {
+          "name": "Bật LED 2 theo ID (ID 2 - GPIO 6)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Bật LED 2 theo ID (ID 2 - GPIO 6) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2,\n  \"action\": \"ON\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Bật đèn LED 2 theo ID thiết bị 2"
+          }
+        },
+        {
+          "name": "Tắt LED 2 theo ID (ID 2 - GPIO 6)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Tắt LED 2 theo ID (ID 2 - GPIO 6) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2,\n  \"action\": \"OFF\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Tắt đèn LED 2 theo ID thiết bị 2"
+          }
+        },
+        {
+          "name": "Bật LED 3 theo ID (ID 3 - GPIO 7)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Bật LED 3 theo ID (ID 3 - GPIO 7) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 3,\n  \"action\": \"ON\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Bật đèn LED 3 theo ID thiết bị 3"
+          }
+        },
+        {
+          "name": "Tắt LED 3 theo ID (ID 3 - GPIO 7)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Tắt LED 3 theo ID (ID 3 - GPIO 7) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 3,\n  \"action\": \"OFF\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Tắt đèn LED 3 theo ID thiết bị 3"
+          }
+        },
+        {
+          "name": "Bật LED 4 theo ID (ID 4 - GPIO 3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Bật LED 4 theo ID (ID 4 - GPIO 3) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -635,7 +552,159 @@
                 "control"
               ]
             },
-            "description": "Điều khiển 1 LED theo trường ID thiết bị (Ví dụ: ID 4 - Đèn cảnh báo GPIO 3)"
+            "description": "Bật đèn LED 4 theo ID thiết bị 4"
+          }
+        },
+        {
+          "name": "Tắt LED 4 theo ID (ID 4 - GPIO 3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Tắt LED 4 theo ID (ID 4 - GPIO 3) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 4,\n  \"action\": \"OFF\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control"
+              ]
+            },
+            "description": "Tắt đèn LED 4 theo ID thiết bị 4"
+          }
+        },
+        {
+          "name": "Bật các LED theo danh sách ID (Batch)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Bật các LED theo danh sách ID (Batch) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    1,\n    2,\n    4\n  ],\n  \"action\": \"ON\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control/batch",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control",
+                "batch"
+              ]
+            },
+            "description": "Bật đồng thời nhiều LED theo mảng ID (ví dụ: [1, 2, 4])"
+          }
+        },
+        {
+          "name": "Tắt các LED theo danh sách ID (Batch)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Tắt các LED theo danh sách ID (Batch) thành công (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Phản hồi success: true\", function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    1,\n    2,\n    4\n  ],\n  \"action\": \"OFF\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/control/batch",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "control",
+                "batch"
+              ]
+            },
+            "description": "Tắt đồng thời nhiều LED theo mảng ID (ví dụ: [1, 2, 4])"
           }
         }
       ]
